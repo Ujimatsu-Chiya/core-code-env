@@ -18,6 +18,7 @@ char** des_src_string_list(const char* json_str, size_t* out_size);
 bool* des_src_bool_list(const char* json_str, size_t* out_size);
 bool des_src_double(const char* json_str, double* out_value);
 double* des_src_double_list(const char* json_str, size_t* out_size);
+int* des_src_tree_list(const char* json_str, size_t* out_size);
 
 char* ser_src_int(int value);
 char* ser_src_long(long long value);
@@ -30,7 +31,7 @@ char* ser_src_string_list(const char** values, size_t size);
 char* ser_src_bool_list(const bool* values, size_t size);
 char* ser_src_double(double value);
 char* ser_src_double_list(const double* values, size_t size);
-
+char* ser_src_tree_list(const int* values, size_t size);
 
 
 

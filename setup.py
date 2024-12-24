@@ -2,9 +2,9 @@ from setuptools import setup, Extension
 
 # 定义扩展模块
 module = Extension(
-    "py_parse_tools",  # 模块名称
+    "py_parse_module",  # 模块名称
     sources=[
-        "py_parse_tools.cpp",  # Python 接口的实现
+        "py_parse_module.cpp",  # Python 接口的实现
         "rapidjson_helper.cpp"  # RapidJSON 相关逻辑
     ],
     include_dirs=[
@@ -21,7 +21,7 @@ module = Extension(
 
 # 调用setup函数
 setup(
-    name="py_parse_tools",
+    name="py_parse_module",
     version="1.0",
     description="A Python module for parsing JSON arrays using RapidJSON.",
     ext_modules=[module],

@@ -1,6 +1,9 @@
 #include "rapidjson_helper.h"
 #include <stdlib.h>
 #include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <climits>
 
 using namespace rapidjson;
 
@@ -317,11 +320,45 @@ double* des_src_double_list(const char* json_str, size_t* out_size) {
     return out_array;  // 返回解析后的 double 数组
 }
 
-#include "rapidjson_helper.h"
-#include <stdlib.h>
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
+int* des_src_tree_list(const char* json_str, size_t* out_size) {
+    // 使用RapidJSON解析JSON字符串
+    Document doc;
+    doc.Parse(json_str);
+
+    // 检查解析是否有错误
+    if (doc.HasParseError()) {
+        return NULL;  // 返回NULL表示解析失败
+    }
+
+    // 检查是否是一个有效的数组
+    if (!doc.IsArray()) {
+        return NULL;  // 返回NULL表示输入不是有效的JSON数组
+    }
+
+    // 获取数组的大小
+    size_t size = doc.Size();
+    *out_size = size;
+
+    // 动态分配int数组来存储解析的整数
+    int* int_array = (int*)malloc(size * sizeof(int));
+    if (!int_array) {
+        return NULL;  // 如果内存分配失败，返回NULL
+    }
+
+    // 遍历JSON数组并提取整数值
+    for (size_t i = 0; i < size; i++) {
+        if (doc[i].IsInt()) {
+            int_array[i] = doc[i].GetInt();  // 将整数存入数组
+        } else if (doc[i].IsNull()) {
+            int_array[i] = INT_MIN;  // 如果值为null，存储INT_MIN
+        } else {
+            free(int_array);  // 如果遇到非整数或非null值，释放内存
+            return NULL;
+        }
+    }
+
+    return int_array;  // 返回解析后的int数组
+}
 
 using namespace rapidjson;
 
@@ -427,5 +464,27 @@ char* ser_src_double_list(const double* values, size_t size) {
         writer.Double(values[i]);
     }
     writer.EndArray();
+    return strdup(buffer.GetString());
+}
+
+char* ser_src_tree_list(const int* values, size_t size) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+
+    // 开始 JSON 数组
+    writer.StartArray();
+    
+    for (size_t i = 0; i < size; ++i) {
+        if (values[i] == INT_MIN) {
+            writer.Null();  // 如果值是 INT_MIN，写入 null
+        } else {
+            writer.Int(values[i]);  // 否则写入整数值
+        }
+    }
+
+    // 结束 JSON 数组
+    writer.EndArray();
+
+    // 返回 JSON 字符串的副本
     return strdup(buffer.GetString());
 }
