@@ -1,5 +1,5 @@
 #include "rapidjson_helper.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -15,12 +15,12 @@ int* des_src_int_list(const char* json_str, size_t* out_size) {
 
     // 检查解析是否有错误
     if (doc.HasParseError()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     // 检查是否是一个有效的数组
     if (!doc.IsArray()) {
-        return NULL;  // 返回NULL表示输入不是有效的JSON数组
+        return nullptr;  // 返回nullptr表示输入不是有效的JSON数组
     }
 
     // 获取数组的大小
@@ -28,9 +28,9 @@ int* des_src_int_list(const char* json_str, size_t* out_size) {
     *out_size = size;
 
     // 动态分配int数组来存储解析的整数
-    int* int_array = (int*)malloc(size * sizeof(int));
+    int* int_array = new(std::nothrow) int[size];
     if (!int_array) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     // 遍历JSON数组并提取整数值
@@ -38,8 +38,8 @@ int* des_src_int_list(const char* json_str, size_t* out_size) {
         if (doc[i].IsInt()) {
             int_array[i] = doc[i].GetInt();  // 将整数存入数组
         } else {
-            free(int_array);  // 如果遇到非整数，释放内存
-            return NULL;
+            delete[] int_array;  // 如果遇到非整数，释放内存
+            return nullptr;
         }
     }
 
@@ -54,12 +54,12 @@ long long* des_src_long_list(const char* json_str, size_t* out_size) {
 
     // 检查解析是否有错误
     if (doc.HasParseError()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     // 检查是否是一个有效的数组
     if (!doc.IsArray()) {
-        return NULL;  // 返回NULL表示输入不是有效的JSON数组
+        return nullptr;  // 返回nullptr表示输入不是有效的JSON数组
     }
 
     // 获取数组的大小
@@ -67,9 +67,9 @@ long long* des_src_long_list(const char* json_str, size_t* out_size) {
     *out_size = size;
 
     // 动态分配long long数组来存储解析的整数
-    long long* long_array = (long long*)malloc(size * sizeof(long long));
+    long long* long_array = new(std::nothrow) long long[size];
     if (!long_array) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     // 遍历JSON数组并提取long long值
@@ -77,8 +77,8 @@ long long* des_src_long_list(const char* json_str, size_t* out_size) {
         if (doc[i].IsInt64()) {
             long_array[i] = doc[i].GetInt64();  // 将long long整数存入数组
         } else {
-            free(long_array);  // 如果遇到非long long整数，释放内存
-            return NULL;
+            delete[] long_array;  // 如果遇到非long long整数，释放内存
+            return nullptr;
         }
     }
 
@@ -157,14 +157,14 @@ char* des_src_string(const char* json_str) {
     doc.Parse(json_str);
 
     if (doc.HasParseError() || !doc.IsString()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     const char* str = doc.GetString();
     size_t len = strlen(str) + 1;
-    char* result = (char*)malloc(len);
+    char* result = new(std::nothrow) char[len];
     if (!result) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
     strncpy(result, str, len);
     return result;  // 返回动态分配的字符串
@@ -176,32 +176,40 @@ int** des_src_int_list_list(const char* json_str, size_t* rows, size_t** cols) {
     doc.Parse(json_str);
 
     if (doc.HasParseError() || !doc.IsArray()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     *rows = doc.Size();
-    int** out_array = (int**)malloc(*rows * sizeof(int*));
-    *cols = (size_t*)malloc(*rows * sizeof(size_t));
+    int** out_array = new(std::nothrow) int*[*rows];
+    *cols = new(std::nothrow) size_t[*rows];
 
     if (!out_array || !*cols) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        delete[] out_array;  // 释放已分配的内存
+        delete[] *cols;
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     for (size_t i = 0; i < *rows; i++) {
         if (!doc[i].IsArray()) {
-            return NULL;
+            delete[] out_array;  // 释放已分配的内存
+            delete[] *cols;
+            return nullptr;
         }
 
         (*cols)[i] = doc[i].Size();
-        out_array[i] = (int*)malloc((*cols)[i] * sizeof(int));
+        out_array[i] = new(std::nothrow) int[(*cols)[i]];
 
         if (!out_array[i]) {
-            return NULL;
+            delete[] out_array;  // 释放已分配的内存
+            delete[] *cols;
+            return nullptr;
         }
 
         for (size_t j = 0; j < (*cols)[i]; j++) {
             if (!doc[i][j].IsInt()) {
-                return NULL;
+                delete[] out_array;  // 释放已分配的内存
+                delete[] *cols;
+                return nullptr;
             }
             out_array[i][j] = doc[i][j].GetInt();
         }
@@ -216,25 +224,27 @@ char** des_src_string_list(const char* json_str, size_t* out_size) {
     doc.Parse(json_str);
 
     if (doc.HasParseError() || !doc.IsArray()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     *out_size = doc.Size();
-    char** out_array = (char**)malloc(*out_size * sizeof(char*));
+    char** out_array = new(std::nothrow) char*[*out_size];
 
     if (!out_array) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     for (size_t i = 0; i < *out_size; i++) {
         if (!doc[i].IsString()) {
-            return NULL;
+            delete[] out_array;  // 释放已分配的内存
+            return nullptr;
         }
         const char* str = doc[i].GetString();
         size_t len = strlen(str) + 1;
-        out_array[i] = (char*)malloc(len);
+        out_array[i] = new(std::nothrow) char[len];
         if (!out_array[i]) {
-            return NULL;
+            delete[] out_array;  // 释放已分配的内存
+            return nullptr;
         }
         strncpy(out_array[i], str, len);
     }
@@ -248,19 +258,20 @@ bool* des_src_bool_list(const char* json_str, size_t* out_size) {
     doc.Parse(json_str);
 
     if (doc.HasParseError() || !doc.IsArray()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     *out_size = doc.Size();
-    bool* out_array = (bool*)malloc(*out_size * sizeof(bool));
+    bool* out_array = new(std::nothrow) bool[*out_size];
 
     if (!out_array) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     for (size_t i = 0; i < *out_size; i++) {
         if (!doc[i].IsBool()) {
-            return NULL;
+            delete[] out_array;  // 释放已分配的内存
+            return nullptr;
         }
         out_array[i] = doc[i].GetBool();
     }
@@ -268,8 +279,8 @@ bool* des_src_bool_list(const char* json_str, size_t* out_size) {
     return out_array;  // 返回解析后的布尔数组
 }
 
+// 解析JSON字符串并返回一个double值
 bool des_src_double(const char* json_str, double* out_value) {
-    // 使用RapidJSON解析JSON字符串
     Document doc;
     doc.Parse(json_str);
 
@@ -289,50 +300,50 @@ bool des_src_double(const char* json_str, double* out_value) {
     return true;  // 返回true表示解析成功
 }
 
+// 解析JSON字符串并返回一个double数组
 double* des_src_double_list(const char* json_str, size_t* out_size) {
-    // 使用 RapidJSON 解析 JSON 字符串
     Document doc;
     doc.Parse(json_str);
 
-    // 检查解析是否出错，或者 JSON 不是数组
+    // 检查解析是否有错误，或者JSON不是数组
     if (doc.HasParseError() || !doc.IsArray()) {
-        return NULL;  // 返回 NULL 表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     // 获取数组大小
     *out_size = doc.Size();
 
-    // 分配内存以存储 double 数组
-    double* out_array = (double*)malloc(*out_size * sizeof(double));
+    // 动态分配内存来存储double数组
+    double* out_array = new(std::nothrow) double[*out_size];
     if (!out_array) {
-        return NULL;  // 如果内存分配失败，返回 NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
-    // 遍历 JSON 数组并解析每个元素
+    // 遍历JSON数组并解析每个元素
     for (size_t i = 0; i < *out_size; i++) {
-        if (!doc[i].IsDouble()) {  // 检查元素是否是 double 类型
-            free(out_array);  // 释放已分配的内存
-            return NULL;      // 返回 NULL 表示解析失败
+        if (!doc[i].IsDouble()) {  // 检查元素是否是double类型
+            delete[] out_array;  // 释放已分配的内存
+            return nullptr;      // 返回nullptr表示解析失败
         }
-        out_array[i] = doc[i].GetDouble();  // 提取 double 值
+        out_array[i] = doc[i].GetDouble();  // 提取double值
     }
 
-    return out_array;  // 返回解析后的 double 数组
+    return out_array;  // 返回解析后的double数组
 }
 
+// 解析JSON字符串并返回一个int数组，处理null值
 int* des_src_tree_list(const char* json_str, size_t* out_size) {
-    // 使用RapidJSON解析JSON字符串
     Document doc;
     doc.Parse(json_str);
 
     // 检查解析是否有错误
     if (doc.HasParseError()) {
-        return NULL;  // 返回NULL表示解析失败
+        return nullptr;  // 返回nullptr表示解析失败
     }
 
     // 检查是否是一个有效的数组
     if (!doc.IsArray()) {
-        return NULL;  // 返回NULL表示输入不是有效的JSON数组
+        return nullptr;  // 返回nullptr表示输入不是有效的JSON数组
     }
 
     // 获取数组的大小
@@ -340,9 +351,9 @@ int* des_src_tree_list(const char* json_str, size_t* out_size) {
     *out_size = size;
 
     // 动态分配int数组来存储解析的整数
-    int* int_array = (int*)malloc(size * sizeof(int));
+    int* int_array = new(std::nothrow) int[size];
     if (!int_array) {
-        return NULL;  // 如果内存分配失败，返回NULL
+        return nullptr;  // 如果内存分配失败，返回nullptr
     }
 
     // 遍历JSON数组并提取整数值
@@ -352,44 +363,75 @@ int* des_src_tree_list(const char* json_str, size_t* out_size) {
         } else if (doc[i].IsNull()) {
             int_array[i] = INT_MIN;  // 如果值为null，存储INT_MIN
         } else {
-            free(int_array);  // 如果遇到非整数或非null值，释放内存
-            return NULL;
+            delete[] int_array;  // 如果遇到非整数或非null值，释放内存
+            return nullptr;
         }
     }
 
     return int_array;  // 返回解析后的int数组
 }
 
-using namespace rapidjson;
-
+// 解析整数并返回字符串
 char* ser_src_int(int value) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     writer.Int(value);
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析long long并返回字符串
 char* ser_src_long(long long value) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     writer.Int64(value);
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析布尔值并返回字符串
 char* ser_src_bool(bool value) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     writer.Bool(value);
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析字符串并返回字符串
 char* ser_src_string(const char* value) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     writer.String(value);
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析整数数组并返回字符串
 char* ser_src_int_list(const int* values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -398,9 +440,17 @@ char* ser_src_int_list(const int* values, size_t size) {
         writer.Int(values[i]);
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析long long数组并返回字符串
 char* ser_src_long_list(const long long* values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -409,9 +459,17 @@ char* ser_src_long_list(const long long* values, size_t size) {
         writer.Int64(values[i]);
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析二维整数数组并返回字符串
 char* ser_src_int_list_list(const int** values, size_t rows, const size_t* cols) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -424,9 +482,17 @@ char* ser_src_int_list_list(const int** values, size_t rows, const size_t* cols)
         writer.EndArray();
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析字符串数组并返回字符串
 char* ser_src_string_list(const char** values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -435,9 +501,17 @@ char* ser_src_string_list(const char** values, size_t size) {
         writer.String(values[i]);
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析布尔值数组并返回字符串
 char* ser_src_bool_list(const bool* values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -446,16 +520,32 @@ char* ser_src_bool_list(const bool* values, size_t size) {
         writer.Bool(values[i]);
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析double并返回字符串
 char* ser_src_double(double value) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     writer.Double(value);
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析double数组并返回字符串
 char* ser_src_double_list(const double* values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -464,9 +554,17 @@ char* ser_src_double_list(const double* values, size_t size) {
         writer.Double(values[i]);
     }
     writer.EndArray();
-    return strdup(buffer.GetString());
+
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
 
+// 解析整数数组（处理null）并返回字符串
 char* ser_src_tree_list(const int* values, size_t size) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -485,6 +583,11 @@ char* ser_src_tree_list(const int* values, size_t size) {
     // 结束 JSON 数组
     writer.EndArray();
 
-    // 返回 JSON 字符串的副本
-    return strdup(buffer.GetString());
+    // 使用new分配内存并复制返回结果
+    size_t len = strlen(buffer.GetString()) + 1;
+    char* result = new(std::nothrow) char[len];
+    if (result) {
+        strncpy(result, buffer.GetString(), len);
+    }
+    return result;
 }
