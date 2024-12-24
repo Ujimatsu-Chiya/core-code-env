@@ -1,6 +1,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include "rapidjson_helper.h"
+#include "py_parse_module.h"
 #include <stdlib.h>
 
 // Helper function to throw Python exceptions
@@ -271,6 +272,36 @@ static PyObject* des_double_list(PyObject* self, PyObject* args) {
     free(double_array);
     return py_list;
 }
+
+static PyObject* des_tree_list(PyObject* self, PyObject* args) {
+    const char* json_str;
+    if (!PyArg_ParseTuple(args, "s", &json_str)) {
+        return NULL; // Argument parsing failed
+    }
+
+    size_t size = 0;
+    int* int_array = des_src_tree_list(json_str, &size);
+
+    if (!int_array) {
+        throw_python_exception(PyExc_ValueError, "Error parsing JSON or invalid array.");
+        return NULL;
+    }
+
+    PyObject* py_list = PyList_New(size);
+    if (!py_list) {
+        free(int_array);
+        throw_python_exception(PyExc_MemoryError, "Failed to allocate memory for Python list.");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        PyList_SetItem(py_list, i, PyLong_FromLong(int_array[i]));
+    }
+
+    free(int_array);
+    return py_list;
+}
+
 
 // Serialization functions
 static PyObject* ser_int(PyObject* self, PyObject* args) {
@@ -641,7 +672,46 @@ static PyObject* ser_bool_list(PyObject* self, PyObject* args) {
     return result;
 }
 
+static PyObject* ser_tree_list(PyObject* self, PyObject* args) {
+    PyObject* py_list;
+    if (!PyArg_ParseTuple(args, "O", &py_list)) {
+        return NULL;
+    }
 
+    if (!PyList_Check(py_list)) {
+        throw_python_exception(PyExc_TypeError, "Expected a list of integers.");
+        return NULL;
+    }
+
+    size_t size = PyList_Size(py_list);
+    int* values = (int*)malloc(size * sizeof(int));
+    if (!values) {
+        throw_python_exception(PyExc_MemoryError, "Failed to allocate memory.");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        PyObject* item = PyList_GetItem(py_list, i);
+        if (!PyLong_Check(item)) {
+            free(values);
+            throw_python_exception(PyExc_TypeError, "List contains non-integer elements.");
+            return NULL;
+        }
+        values[i] = PyLong_AsLong(item);
+    }
+
+    char* json_str = ser_src_int_list(values, size);
+    free(values);
+
+    if (!json_str) {
+        throw_python_exception(PyExc_RuntimeError, "Error serializing integer list.");
+        return NULL;
+    }
+
+    PyObject* result = PyUnicode_FromString(json_str);
+    free(json_str);
+    return result;
+}
 
 
 // Method definitions
@@ -866,20 +936,44 @@ static PyMethodDef JsonParserMethods[] = {
         "Returns:\n"
         "    str: A JSON string representing the list of booleans."
     },
+    {
+    "ser_tree_list", 
+    ser_tree_list, 
+    METH_VARARGS, 
+    "Serialize a Python list of integers into a JSON array string.\n"
+    "This function converts a Python list of integers into a JSON string, "
+    "and converts any null elements in the list to null in the resulting JSON.\n"
+    "Arguments:\n"
+    "    py_list (List[int]): A Python list of integers, where null elements are represented as null in JSON.\n"
+    "Returns:\n"
+    "    str: A JSON string representing the list, with nulls converted to null in JSON."
+    },
+    {
+    "des_tree_list", 
+    des_tree_list, 
+    METH_VARARGS, 
+    "Deserialize a JSON array string into a Python list of integers.\n"
+    "This function parses a JSON string representing an array of integers, "
+    "where any null values in the JSON array are represented as INT_MIN in the resulting list.\n"
+    "Arguments:\n"
+    "    json_str (str): A JSON string containing an array of integers, where null values are represented as null in JSON.\n"
+    "Returns:\n"
+    "    List[int]: A Python list of integers, with INT_MIN for null values."
+    },
     {NULL, NULL, 0, NULL} // Sentinel
 };
 
 
 // Module definition
-static struct PyModuleDef py_parse_tools_rmodule = {
+static struct PyModuleDef py_parse_module_rmodule = {
     PyModuleDef_HEAD_INIT,
-    "py_parse_tools",   // Module name
+    "py_parse_module",   // Module name
     "A module for JSON parsing using RapidJSON.",  // Module description
     -1,             // Module size
     JsonParserMethods
 };
 
 // Module initialization
-PyMODINIT_FUNC PyInit_py_parse_tools(void) {
-    return PyModule_Create(&py_parse_tools_rmodule);
+PyMODINIT_FUNC PyInit_py_parse_module(void) {
+    return PyModule_Create(&py_parse_module_rmodule);
 }
