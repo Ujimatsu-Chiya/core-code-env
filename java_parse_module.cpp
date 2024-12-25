@@ -12,7 +12,7 @@ static void throw_java_exception(JNIEnv* env, const char* exception_class, const
 }
 
 
-JNIEXPORT jintArray JNICALL Java_JavaParseModule_desIntList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jintArray JNICALL Java_JavaParseModule_desIntList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -46,7 +46,7 @@ JNIEXPORT jintArray JNICALL Java_JavaParseModule_desIntList(JNIEnv* env, jobject
     return result;
 }
 
-JNIEXPORT jlongArray JNICALL Java_JavaParseModule_desLongList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jlongArray JNICALL Java_JavaParseModule_desLongList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -81,7 +81,7 @@ JNIEXPORT jlongArray JNICALL Java_JavaParseModule_desLongList(JNIEnv* env, jobje
     return result;
 }
 
-JNIEXPORT jbooleanArray JNICALL Java_JavaParseModule_desBoolList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jbooleanArray JNICALL Java_JavaParseModule_desBoolList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -125,7 +125,7 @@ JNIEXPORT jbooleanArray JNICALL Java_JavaParseModule_desBoolList(JNIEnv* env, jo
     return result;
 }
 
-JNIEXPORT jint JNICALL Java_JavaParseModule_desInt(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jint JNICALL Java_JavaParseModule_desInt(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -143,7 +143,7 @@ JNIEXPORT jint JNICALL Java_JavaParseModule_desInt(JNIEnv* env, jobject obj, jst
     return value;
 }
 
-JNIEXPORT jlong JNICALL Java_JavaParseModule_desLong(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jlong JNICALL Java_JavaParseModule_desLong(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -161,7 +161,7 @@ JNIEXPORT jlong JNICALL Java_JavaParseModule_desLong(JNIEnv* env, jobject obj, j
     return static_cast<jlong>(value);
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_desString(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_desString(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -186,7 +186,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_desString(JNIEnv* env, jobject ob
     return result;
 }
 
-JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -225,7 +225,7 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList(JNIEnv* env, 
     return result;
 }
 
-JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -262,7 +262,7 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList(JNIEnv* env, j
     return result;
 }
 
-JNIEXPORT jdoubleArray JNICALL Java_JavaParseModule_desDoubleList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jdoubleArray JNICALL Java_JavaParseModule_desDoubleList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -295,7 +295,7 @@ JNIEXPORT jdoubleArray JNICALL Java_JavaParseModule_desDoubleList(JNIEnv* env, j
 
     return result;
 }
-JNIEXPORT jboolean JNICALL Java_JavaParseModule_desBool(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jboolean JNICALL Java_JavaParseModule_desBool(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -312,7 +312,7 @@ JNIEXPORT jboolean JNICALL Java_JavaParseModule_desBool(JNIEnv* env, jobject obj
 
     return value ? JNI_TRUE : JNI_FALSE;
 }
-JNIEXPORT jdouble JNICALL Java_JavaParseModule_desDouble(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jdouble JNICALL Java_JavaParseModule_desDouble(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -330,7 +330,7 @@ JNIEXPORT jdouble JNICALL Java_JavaParseModule_desDouble(JNIEnv* env, jobject ob
     return value;
 }
 
-JNIEXPORT jintArray JNICALL Java_JavaParseModule_desTreeList(JNIEnv* env, jobject obj, jstring arg) {
+JNIEXPORT jintArray JNICALL Java_JavaParseModule_desTreeList(JNIEnv* env, jclass clazz, jstring arg) {
     // Convert jstring to C++ string
     const char* json_str = env->GetStringUTFChars(arg, nullptr);
 
@@ -364,7 +364,7 @@ JNIEXPORT jintArray JNICALL Java_JavaParseModule_desTreeList(JNIEnv* env, jobjec
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serInt(JNIEnv* env, jobject obj, jint value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serInt(JNIEnv* env, jclass clazz, jint value) {
     // Serialize the int value using the existing ser_src_int function
     char* result_str = ser_src_int(value);
 
@@ -383,7 +383,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serInt(JNIEnv* env, jobject obj, 
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serLong(JNIEnv* env, jobject obj, jlong value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serLong(JNIEnv* env, jclass clazz, jlong value) {
     // Serialize the long value using the existing ser_src_long function
     char* result_str = ser_src_long(value);
 
@@ -402,7 +402,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serLong(JNIEnv* env, jobject obj,
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serBool(JNIEnv* env, jobject obj, jboolean value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serBool(JNIEnv* env, jclass clazz, jboolean value) {
     // Serialize the boolean value using the existing ser_src_bool function
     char* result_str = ser_src_bool(value == JNI_TRUE);
 
@@ -421,7 +421,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBool(JNIEnv* env, jobject obj,
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serString(JNIEnv* env, jobject obj, jstring value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serString(JNIEnv* env, jclass clazz, jstring value) {
     // Convert jstring to C string
     const char* input_str = env->GetStringUTFChars(value, nullptr);
 
@@ -446,7 +446,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serString(JNIEnv* env, jobject ob
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList(JNIEnv* env, jobject obj, jintArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList(JNIEnv* env, jclass clazz, jintArray value) {
     // Get the length of the jintArray
     jsize size = env->GetArrayLength(value);
 
@@ -474,7 +474,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList(JNIEnv* env, jobject o
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList(JNIEnv* env, jobject obj, jlongArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList(JNIEnv* env, jclass clazz, jlongArray value) {
     // Get the length of the jlongArray
     jsize size = env->GetArrayLength(value);
 
@@ -502,7 +502,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList(JNIEnv* env, jobject 
     return result;
 }
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble(JNIEnv* env, jobject obj, jdouble value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble(JNIEnv* env, jclass clazz, jdouble value) {
     // Serialize the double value using the existing ser_src_double function
     char* result_str = ser_src_double(value);
 
@@ -520,7 +520,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble(JNIEnv* env, jobject ob
 
     return result;
 }
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList(JNIEnv* env, jobject obj, jdoubleArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList(JNIEnv* env, jclass clazz, jdoubleArray value) {
     // Get the length of the jdoubleArray
     jsize size = env->GetArrayLength(value);
 
@@ -547,7 +547,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList(JNIEnv* env, jobjec
 
     return result;
 }
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList(JNIEnv* env, jobject obj, jobjectArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList(JNIEnv* env, jclass clazz, jobjectArray value) {
     // Get the length of the jobjectArray (int[] array)
     jsize size = env->GetArrayLength(value);
 
@@ -601,7 +601,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList(JNIEnv* env, jobje
 }
 
 
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList(JNIEnv* env, jobject obj, jobjectArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList(JNIEnv* env, jclass clazz, jobjectArray value) {
     // Get the length of the jobjectArray
     jsize size = env->GetArrayLength(value);
 
@@ -635,7 +635,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList(JNIEnv* env, jobjec
 
     return result;
 }
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jobject obj, jbooleanArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jclass clazz, jbooleanArray value) {
     // Get the length of the jbooleanArray
     jsize size = env->GetArrayLength(value);
 
@@ -662,7 +662,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jobject 
 
     return result;
 }
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList(JNIEnv* env, jobject obj, jobjectArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList(JNIEnv* env, jclass clazz, jobjectArray value) {
     // Get the length of the jobjectArray
     jsize size = env->GetArrayLength(value);
 

@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;)[I
  */
 JNIEXPORT jintArray JNICALL Java_JavaParseModule_desIntList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -21,7 +21,7 @@ JNIEXPORT jintArray JNICALL Java_JavaParseModule_desIntList
  * Signature: (Ljava/lang/String;)[J
  */
 JNIEXPORT jlongArray JNICALL Java_JavaParseModule_desLongList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -29,7 +29,7 @@ JNIEXPORT jlongArray JNICALL Java_JavaParseModule_desLongList
  * Signature: (Ljava/lang/String;)[Z
  */
 JNIEXPORT jbooleanArray JNICALL Java_JavaParseModule_desBoolList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -37,7 +37,7 @@ JNIEXPORT jbooleanArray JNICALL Java_JavaParseModule_desBoolList
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_JavaParseModule_desInt
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -45,7 +45,7 @@ JNIEXPORT jint JNICALL Java_JavaParseModule_desInt
  * Signature: (Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_JavaParseModule_desLong
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -53,7 +53,7 @@ JNIEXPORT jlong JNICALL Java_JavaParseModule_desLong
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_desString
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -61,7 +61,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_desString
  * Signature: (Ljava/lang/String;)[[I
  */
 JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -69,7 +69,7 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList
  * Signature: (Ljava/lang/String;)[Ljava/lang/String;
  */
 JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -77,7 +77,7 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList
  * Signature: (Ljava/lang/String;)[D
  */
 JNIEXPORT jdoubleArray JNICALL Java_JavaParseModule_desDoubleList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -85,7 +85,7 @@ JNIEXPORT jdoubleArray JNICALL Java_JavaParseModule_desDoubleList
  * Signature: (Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_JavaParseModule_desBool
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -93,7 +93,7 @@ JNIEXPORT jboolean JNICALL Java_JavaParseModule_desBool
  * Signature: (Ljava/lang/String;)D
  */
 JNIEXPORT jdouble JNICALL Java_JavaParseModule_desDouble
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -101,7 +101,7 @@ JNIEXPORT jdouble JNICALL Java_JavaParseModule_desDouble
  * Signature: (Ljava/lang/String;)[I
  */
 JNIEXPORT jintArray JNICALL Java_JavaParseModule_desTreeList
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -109,7 +109,7 @@ JNIEXPORT jintArray JNICALL Java_JavaParseModule_desTreeList
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serInt
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jclass, jint);
 
 /*
  * Class:     JavaParseModule
@@ -117,7 +117,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serInt
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serLong
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     JavaParseModule
@@ -125,7 +125,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serLong
  * Signature: (Z)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serBool
-  (JNIEnv *, jobject, jboolean);
+  (JNIEnv *, jclass, jboolean);
 
 /*
  * Class:     JavaParseModule
@@ -133,7 +133,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBool
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serString
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     JavaParseModule
@@ -141,7 +141,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serString
  * Signature: ([I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList
-  (JNIEnv *, jobject, jintArray);
+  (JNIEnv *, jclass, jintArray);
 
 /*
  * Class:     JavaParseModule
@@ -149,7 +149,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList
  * Signature: ([J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList
-  (JNIEnv *, jobject, jlongArray);
+  (JNIEnv *, jclass, jlongArray);
 
 /*
  * Class:     JavaParseModule
@@ -157,7 +157,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList
  * Signature: (D)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble
-  (JNIEnv *, jobject, jdouble);
+  (JNIEnv *, jclass, jdouble);
 
 /*
  * Class:     JavaParseModule
@@ -165,7 +165,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble
  * Signature: ([D)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList
-  (JNIEnv *, jobject, jdoubleArray);
+  (JNIEnv *, jclass, jdoubleArray);
 
 /*
  * Class:     JavaParseModule
@@ -173,7 +173,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList
  * Signature: ([Ljava/lang/Object;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList
-  (JNIEnv *, jobject, jobjectArray);
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     JavaParseModule
@@ -181,7 +181,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList
  * Signature: ([Ljava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList
-  (JNIEnv *, jobject, jobjectArray);
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     JavaParseModule
@@ -189,7 +189,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList
  * Signature: ([Z)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList
-  (JNIEnv *, jobject, jbooleanArray);
+  (JNIEnv *, jclass, jbooleanArray);
 
 /*
  * Class:     JavaParseModule
@@ -197,7 +197,7 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList
  * Signature: ([I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList
-  (JNIEnv *, jobject, jintArray);
+  (JNIEnv *, jclass, jintArray);
 
 #ifdef __cplusplus
 }
