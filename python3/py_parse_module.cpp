@@ -1,6 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include "rapidjson_helper.h"
+#include "../rapidjson_helper.h"
 #include "py_parse_module.h"
 #include <stdlib.h>
 #include <new>

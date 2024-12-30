@@ -1,5 +1,5 @@
 #include <stdexcept>  // 用于抛出异常
-#include "rapidjson_helper.h"
+#include "../rapidjson_helper.h"
 #include "c_parse_module.h"
 
 int des_int(const char* json_str) {
