@@ -1,6 +1,6 @@
 #include <vector>
 #include <stdexcept>
-#include "rapidjson_helper.h"
+#include "../rapidjson_helper.h"
 #include "cpp_parse_module.h"
 
 std::vector<int> des_int_list(const char* json_str) {

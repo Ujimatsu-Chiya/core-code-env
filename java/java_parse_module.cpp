@@ -1,6 +1,6 @@
 #include <jni.h>
 #include "JavaParseModule.h"
-#include "rapidjson_helper.h"
+#include "../rapidjson_helper.h"
 #include <new>
 
 // Helper function to throw Java exceptions
