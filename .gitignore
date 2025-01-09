@@ -1,2 +1,65 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+VENV/
+
+# macOS specific
+.DS_Store
+
+# VSCode specific
 .vscode/
+
+# PyCharm specific
+.idea/
+
+# Jupyter Notebook specific
+.ipynb_checkpoints/
+
+# Build directories
 build/
+dist/
+.eggs/
+*.egg-info/
+*.eggs/
+
+# C++/Java specific
+*.so
+*.a
+*.out
+*.dSYM/
+*.class
+
+# Temporary files
+tmp/
+result/
+
+# Log files
+*.log
+
+# Backup files
+*~
+*.bak
+*.swp
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Coverage reports
+.coverage
+*.coveragerc
+coverage.xml
+*.lcov
+
+# Test and IDE specific files
+*.pytest_cache/
+nosetests.xml
+coverage-report/
+
+# Static file directory for web projects (e.g., Django, Flask)
+static/

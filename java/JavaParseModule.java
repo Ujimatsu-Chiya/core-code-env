@@ -31,11 +31,3 @@ public class JavaParseModule {
     public static native String serBoolList(boolean[] value);
     public static native String serTreeList(int[] value);
 }
-
-/*
- * 
-g++ -fPIC -shared -o libjava_parse_module.so java_parse_module.cpp rapidjson_helper.cpp -I$JAVA_HOME/include -I$JAVA_HOME/include/linux
-javac JavaParseModule.java 
-javac -h . JavaParseModule.java 
-java -Djava.library.path=. JavaParseModule
- */

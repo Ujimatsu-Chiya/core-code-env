@@ -4,7 +4,7 @@
 #include "cpp_node_type.h"
 #include "cpp_parse_module.h"
 
-TreeNode *des_tree(char *json_str);
+TreeNode *des_tree(const char *json_str);
 char *ser_tree(TreeNode *root);
 void delete_tree(TreeNode *root);
 ListNode *des_linked_list(const char *json_str);

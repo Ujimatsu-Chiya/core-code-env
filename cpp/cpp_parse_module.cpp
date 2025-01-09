@@ -180,9 +180,6 @@ char* ser_long_list(const std::vector<long long>& values) {
 }
 
 char* ser_int_list_list(const std::vector<std::vector<int>>& values) {
-    if (values.empty()) {
-        return nullptr;  // Return null for empty list, or could choose empty array format like "[]"
-    }
 
     size_t rows = values.size();
     size_t* cols = new size_t[rows];
@@ -210,9 +207,6 @@ char* ser_int_list_list(const std::vector<std::vector<int>>& values) {
 }
 
 char* ser_string_list(const std::vector<std::string>& values) {
-    if (values.empty()) {
-        return nullptr;  // Return null for empty list, or could choose empty array format like "[]"
-    }
 
     size_t size = values.size();
     const char** string_array = new const char*[size];
@@ -230,9 +224,6 @@ char* ser_string_list(const std::vector<std::string>& values) {
 }
 
 char* ser_bool_list(const std::vector<bool>& values) {
-    if (values.empty()) {
-        return nullptr;  // Return null for empty list, or could choose empty array format like "[]"
-    }
 
     size_t size = values.size();
     bool* bool_array = new bool[size];
@@ -252,9 +243,6 @@ char* ser_double(double value) {
 }
 
 char* ser_double_list(const std::vector<double>& values) {
-    if (values.empty()) {
-        return nullptr;  // Return null for empty list, or could choose empty array format like "[]"
-    }
 
     size_t size = values.size();
     double* double_array = new double[size];
@@ -270,10 +258,7 @@ char* ser_double_list(const std::vector<double>& values) {
 }
 
 char* ser_tree_list(const std::vector<int>& values) {
-    if (values.empty()) {
-        return nullptr;  // Return null for empty list, or could choose empty array format like "[]"
-    }
-
+    
     size_t size = values.size();
     int* tree_array = new int[size];
 

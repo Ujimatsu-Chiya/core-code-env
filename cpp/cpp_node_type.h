@@ -1,3 +1,6 @@
+#ifndef CPP_NODE_TYPE_H
+#define CPP_NODE_TYPE_H
+
 struct TreeNode {
     int val;
     TreeNode *left;
@@ -12,3 +15,5 @@ struct ListNode {
     ListNode *next;
     ListNode(int x) : val(x), next(nullptr) {}
 };
+
+#endif // CPP_NODE_TYPE_H

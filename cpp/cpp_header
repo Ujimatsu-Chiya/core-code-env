@@ -1,0 +1,14 @@
+#include "cpp_io_tools.h"
+#include "cpp_parse_tools.h"
+#include "cpp_node_type.h"
+# include <bits/stdc++.h>
+using namespace std;
+
+
+static inline unsigned long long __get_cpu_time() {
+    struct timespec ts;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+    return (unsigned long long)ts.tv_sec * 1000000000UL + ts.tv_nsec;
+}
+
+// The user's code will be inserted below here.

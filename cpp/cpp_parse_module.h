@@ -1,7 +1,7 @@
 #ifndef CPP_PARSE_MODULE_H
 #define CPP_PARSE_MODULE_H
 
-#include <stddef.h>  // 用于 size_t
+#include <stddef.h>
 #include <vector>
 #include <string>
 
@@ -9,7 +9,6 @@
 extern "C" {
 #endif
 
-// 反序列化函数，返回C++ STL容器
 std::vector<int> des_int_list(const char* json_str);
 int des_int(const char* json_str);
 long long des_long(const char* json_str);

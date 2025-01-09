@@ -1,0 +1,40 @@
+import bisect
+from bisect import *
+import collections
+from collections import *
+import copy
+from copy import *
+import datetime
+from datetime import *
+import functools
+from functools import *
+import heapq
+from heapq import *
+import io
+from io import *
+import itertools
+from itertools import *
+import json
+from json import *
+import math
+from math import *
+import operator
+from operator import *
+import random
+from random import *
+import re
+from re import *
+import statistics
+from statistics import *
+import string
+from string import *
+import sys
+from sys import *
+
+
+from py_node_type import *
+from typing import *
+
+
+# The user's code will be inserted below here.
+
