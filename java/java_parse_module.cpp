@@ -447,6 +447,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serString(JNIEnv* env, jclass cla
 }
 
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList(JNIEnv* env, jclass clazz, jintArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jintArray
     jsize size = env->GetArrayLength(value);
 
@@ -475,6 +479,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntList(JNIEnv* env, jclass cl
 }
 
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serLongList(JNIEnv* env, jclass clazz, jlongArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jlongArray
     jsize size = env->GetArrayLength(value);
 
@@ -521,6 +529,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDouble(JNIEnv* env, jclass cla
     return result;
 }
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList(JNIEnv* env, jclass clazz, jdoubleArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jdoubleArray
     jsize size = env->GetArrayLength(value);
 
@@ -548,6 +560,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serDoubleList(JNIEnv* env, jclass
     return result;
 }
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList(JNIEnv* env, jclass clazz, jobjectArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jobjectArray (int[] array)
     jsize size = env->GetArrayLength(value);
 
@@ -602,6 +618,11 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serIntListList(JNIEnv* env, jclas
 
 
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList(JNIEnv* env, jclass clazz, jobjectArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
+
     // Get the length of the jobjectArray
     jsize size = env->GetArrayLength(value);
 
@@ -636,6 +657,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serStringList(JNIEnv* env, jclass
     return result;
 }
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jclass clazz, jbooleanArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jbooleanArray
     jsize size = env->GetArrayLength(value);
 
@@ -663,6 +688,10 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jclass c
     return result;
 }
 JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList(JNIEnv* env, jclass clazz, jobjectArray value) {
+    if (value == nullptr) {
+        // Directly return the string "[]"
+        return env->NewStringUTF("[]");
+    }
     // Get the length of the jobjectArray
     jsize size = env->GetArrayLength(value);
 
