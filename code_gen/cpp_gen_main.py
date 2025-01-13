@@ -1,10 +1,13 @@
+import os
+import shutil
+import subprocess
 from typing import List
-from utils import TypeEnum
+from utils import TypeEnum, json_default_val
 
 cpp_type = {
     TypeEnum.BOOL: 'bool',
     TypeEnum.INT: 'int',
-    TypeEnum.LONG: 'long',
+    TypeEnum.LONG: 'long long',
     TypeEnum.DOUBLE: 'double',
     TypeEnum.STRING: 'string',
     TypeEnum.INT_LIST: 'vector<int>',
@@ -14,7 +17,7 @@ cpp_type = {
     TypeEnum.BOOL_LIST: 'vector<bool>',
     TypeEnum.TREENODE: 'TreeNode*',
     TypeEnum.LISTNODE: 'ListNode*',
-    TypeEnum.LONG_LIST: 'vector<long>'
+    TypeEnum.LONG_LIST: 'vector<long long>'
 }
 
 cpp_default_val = {
@@ -30,7 +33,7 @@ cpp_default_val = {
     TypeEnum.BOOL_LIST: 'vector<bool>()',
     TypeEnum.TREENODE: 'nullptr',
     TypeEnum.LISTNODE: 'nullptr',
-    TypeEnum.LONG_LIST: 'vector<long>()'
+    TypeEnum.LONG_LIST: 'vector<long long>()'
 }
 
 des_func_name = {
@@ -67,7 +70,7 @@ ser_func_name = {
 
 TIME_COST_PATH = 'time_cost.txt'
 
-def _generate_cpp_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
+def _cpp_generate_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
     params_list = []
     for p_type, p_name in zip(params_type, params_name):
         p_type_str = cpp_type[p_type]
@@ -79,7 +82,7 @@ def cpp_generate_solution_code(function_name:str, params_type:List[TypeEnum], pa
     lines = [
         'class Solution{',
         'public:',
-        f"    {_generate_cpp_signature(function_name, params_type, params_name, return_type)}{{",
+        f"    {_cpp_generate_signature(function_name, params_type, params_name, return_type)}{{",
         '        // write code here',
         f'        return {cpp_default_val[return_type]};',
         '    }',
@@ -135,3 +138,74 @@ def cpp_generate_trailer_code(function_name:str, params_type:List[TypeEnum], par
     ]
 
     return "\n".join(lines)
+
+def cpp_test(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+    try:
+        TMP = 'tmp'
+        PATH = 'cpp'
+
+        os.makedirs(TMP, exist_ok=True)
+        with open(os.path.join(TMP, 'user.in'),'w') as fp:
+            for p_type in params_type:
+                fp.write(json_default_val[p_type] + '\n')
+
+        
+    
+        solution_code = cpp_generate_solution_code(function_name, params_type, params_name, return_type)
+        trailer_code = cpp_generate_trailer_code(function_name, params_type, params_name, return_type)
+
+        with open(os.path.join(TMP, 'main.cpp'), 'w') as fp:
+            with open(os.path.join(PATH, 'cpp_header')) as fq:
+                fp.write(fq.read() + '\n' + solution_code + trailer_code)
+    
+        tmp_list = [filename for filename in os.listdir(PATH) if filename.startswith('libcpp_') and filename.endswith('.so')]
+        current_dir = os.getcwd()
+        if len(tmp_list) == 0:
+            print(f"No files matching the condition were found in the {PATH} directory. Running the build command...")
+            os.chdir(PATH)
+            subprocess.run(['g++', '-shared', '-o', 'libcpp_parse_tools.so', '-fPIC', 'cpp_parse_tools.cpp', 'cpp_parse_module.cpp', '../rapidjson_helper.cpp'])
+            os.chdir(current_dir)
+        else:
+            print(f"{tmp_list[0]} already exists in the {PATH} directory. No need to run the build command.")
+
+        for filename in ['cpp_io_tools.h', 'cpp_node_type.h', 'cpp_parse_tools.h', 'cpp_parse_module.h', 'libcpp_parse_tools.so']:
+            src = os.path.join(PATH, filename)
+            dst = os.path.join(TMP, filename)
+            shutil.copy(src, dst)
+    
+        os.chdir(TMP)
+        result = subprocess.run(['g++', '-o', 'main', 'main.cpp', '-L.', '-lcpp_parse_tools', '-Wl,-rpath=.'],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True)
+
+    
+        if result.returncode != 0:
+            return result.returncode, result.stderr
+    
+        result = subprocess.run(['./main'],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True)
+        if result.returncode != 0:
+            return result.returncode, result.stderr
+
+        os.chdir(current_dir)
+    
+        required_files = ['user.out', 'time_cost.txt']
+        files_in_directory = os.listdir(TMP)
+
+        missing_files = [file for file in required_files if file not in files_in_directory]
+        if missing_files:
+            return 1, f"Missing these files: {', '.join(missing_files)}"
+        return 0, {'main_body.cpp' : solution_code, 'main_trailer.cpp' : trailer_code}
+    finally:
+        shutil.rmtree(TMP)
+
+if __name__ == '__main__':
+    params_type = [TypeEnum.INT, TypeEnum.LONG, TypeEnum.DOUBLE, TypeEnum.STRING, TypeEnum.INT_LIST,
+                   TypeEnum.INT_LIST_LIST, TypeEnum.DOUBLE_LIST, TypeEnum.STRING_LIST, TypeEnum.BOOL_LIST,
+                   TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
+    params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    return_type = TypeEnum.INT_LIST_LIST
+    print(cpp_test('solve', params_type, params_name, return_type)[1])

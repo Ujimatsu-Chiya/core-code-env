@@ -1,5 +1,8 @@
+import os
+import shutil
+import subprocess
 from typing import List
-from utils import TypeEnum
+from utils import TypeEnum, json_default_val
 
 py_type = {
     TypeEnum.BOOL: 'bool',
@@ -67,7 +70,7 @@ ser_func_name = {
 
 TIME_COST_PATH = 'time_cost.txt'
 
-def _generate_py_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
+def _py_generate_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
     params_list = []
     for p_type, p_name in zip(params_type, params_name):
         p_type_str = py_type[p_type]
@@ -78,7 +81,7 @@ def _generate_py_signature(function_name:str, params_type:List[TypeEnum], params
 def py_generate_solution_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
     lines = [
         'class Solution:',
-        f"    {_generate_py_signature(function_name, params_type, params_name, return_type)}",
+        f"    {_py_generate_signature(function_name, params_type, params_name, return_type)}",
         '        # write code here',
         f'        return {py_default_val[return_type]}',
     ]
@@ -132,3 +135,67 @@ def py_generate_main_code(function_name:str, params_type:List[TypeEnum], params_
     ]
     return "\n".join(lines)
 
+
+def py_test(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+    try:
+        TMP = 'tmp'
+        PATH = 'python3'
+        os.makedirs(TMP, exist_ok=True)
+        with open(os.path.join(TMP, 'user.in'),'w') as fp:
+            for p_type in params_type:
+                fp.write(json_default_val[p_type] + '\n')
+
+        solution_code = py_generate_solution_code(function_name, params_type, params_name, return_type)
+
+        with open(os.path.join(TMP, 'solution.py'), 'w') as fp:
+            with open(os.path.join(PATH, 'py_header')) as fq:
+                fp.write(fq.read() + '\n' + solution_code)
+    
+        tmp_list = [filename for filename in os.listdir(PATH) if filename.startswith('py') and filename.endswith('.so')]
+        current_dir = os.getcwd()
+        if len(tmp_list) == 0:
+            print(f"No files matching the condition were found in the {PATH} directory. Running the build command...")
+            os.chdir(PATH)
+            subprocess.run(['python3', 'setup.py', 'build', '--build-lib', '.'])
+            os.chdir(current_dir)
+        else:
+            print(f"{tmp_list[0]} already exists in the {PATH} directory. No need to run the build command.")
+
+        for filename in os.listdir(PATH):
+            if filename.startswith('py') and (filename.endswith('.py') or filename.endswith('.so')):
+                src = os.path.join(PATH, filename)
+                dst = os.path.join(TMP, filename)
+                shutil.copy(src, dst)
+    
+        main_code = py_generate_main_code(function_name, params_type, params_name, return_type)
+        with open(os.path.join(TMP, 'main.py'), 'w') as fp:
+            fp.write(main_code)
+    
+        os.chdir(TMP)
+        result = subprocess.run(['python3', 'main.py'],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True)
+
+        os.chdir(current_dir)
+        if result.returncode != 0:
+           return result.returncode, result.stderr
+
+        required_files = ['user.out', 'time_cost.txt']
+        files_in_directory = os.listdir(TMP)
+
+        missing_files = [file for file in required_files if file not in files_in_directory]
+        if missing_files:
+            return 1, f"Missing these files: {', '.join(missing_files)}"
+        
+        return 0, {'solution_body.py' : solution_code, 'main.py' : main_code}
+    finally:
+        shutil.rmtree(TMP)
+
+if __name__ == '__main__':
+    params_type = [TypeEnum.INT, TypeEnum.LONG, TypeEnum.DOUBLE, TypeEnum.STRING, TypeEnum.INT_LIST,
+                   TypeEnum.INT_LIST_LIST, TypeEnum.DOUBLE_LIST, TypeEnum.STRING_LIST, TypeEnum.BOOL_LIST,
+                   TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
+    params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    return_type = TypeEnum.INT_LIST_LIST
+    print(py_test('solve', params_type, params_name, return_type)[1])

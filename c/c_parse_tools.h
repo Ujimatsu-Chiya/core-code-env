@@ -9,10 +9,12 @@ extern "C" {
 #endif
 
 
-struct TreeNode* des_tree(const char* json_str);
+struct TreeNode* des_tree(char* json_str);
 char *ser_tree(struct TreeNode *root);
-struct ListNode *des_linked_list(const char *json_str);
+void delete_tree(struct TreeNode *root);
+struct ListNode *des_linked_list(char *json_str);
 char *ser_linked_list(struct ListNode *head);
+void delete_linked_list(struct ListNode *head);
 
 #ifdef __cplusplus
 }

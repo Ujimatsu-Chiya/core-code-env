@@ -1,3 +1,6 @@
+#ifndef CPP_IO_TOOLS_H
+#define CPP_IO_TOOLS_H
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -65,3 +68,5 @@ public:
         }
     }
 };
+
+#endif // CPP_IO_TOOLS_H
