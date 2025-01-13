@@ -36,7 +36,7 @@ static struct TreeNode* des_tree_aux(int* arr, int n) {
     return root;
 }
 
-struct TreeNode* des_tree(const char* json_str) {
+struct TreeNode* des_tree(char* json_str) {
     size_t n;
     int* arr = des_tree_list(json_str, &n);
     return des_tree_aux(arr, n);
@@ -113,7 +113,7 @@ static struct ListNode* des_linked_list_aux(int* arr, int n) {
     return head;
 }
 
-struct ListNode* des_linked_list(const char* json_str) {
+struct ListNode* des_linked_list(char* json_str) {
     size_t n;
     int* arr = des_int_list(json_str, &n);
     return des_linked_list_aux(arr, n);
@@ -159,4 +159,3 @@ char* ser_linked_list(struct ListNode* head) {
     return json_str;
 }
 
-// g++ -shared -o libc_parse_tools.so -fPIC c_parse_tools.c c_parse_module.cpp ../rapidjson_helper.cpp 
