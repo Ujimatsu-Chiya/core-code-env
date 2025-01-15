@@ -1,6 +1,6 @@
 import { TreeNode, ListNode } from './ts_type_node';
 
-export function desIntList(jsonStr: string): number[] {
+export function desNumberList(jsonStr: string): number[] {
     const parsed = JSON.parse(jsonStr);
 
     if (!Array.isArray(parsed)) {
@@ -15,7 +15,7 @@ export function desIntList(jsonStr: string): number[] {
     });
 }
 
-export function desInt(jsonStr: string): number {
+export function desNumber(jsonStr: string): number {
     const parsed = JSON.parse(jsonStr);
     if (typeof parsed !== "number") {
         throw new TypeError("Input is not a valid number");
@@ -39,14 +39,14 @@ export function desString(jsonStr: string): string {
     return parsed;
 }
 
-export function desIntListList(jsonStr: string): (number[] | null)[] {
+export function desNumberListList(jsonStr: string): number[][] {
     const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
 
     return parsed.map(row => {
-        if (row === null) return null;
+        if (row === null) return [];
         if (!Array.isArray(row)) {
             throw new TypeError("Row is not a valid array");
         }
@@ -98,7 +98,7 @@ export function desTreeList(jsonStr: string): (number | null)[] {
     });
 }
 
-export function serInt(value: number): string {
+export function serNumber(value: number): string {
     return JSON.stringify(value);
 }
 
@@ -110,11 +110,11 @@ export function serString(value: string): string {
     return JSON.stringify(value);
 }
 
-export function serIntList(values: number[]): string {
+export function serNumberList(values: number[]): string {
     return JSON.stringify(values);
 }
 
-export function serIntListList(values: number[][]): string {
+export function serNumberListList(values: number[][]): string {
     return JSON.stringify(values);
 }
 
@@ -130,7 +130,7 @@ export function serTreeList(values: (number | null)[]): string {
     return JSON.stringify(values);
 }
 
-function desTreeAux(arr: number[]): TreeNode | null {
+function desTreeAux(arr: (number | null)[]): TreeNode | null {
     const n = arr.length;
     if (n === 0 || arr[0] === null) {
         return null;
@@ -144,13 +144,13 @@ function desTreeAux(arr: number[]): TreeNode | null {
         const node = q.shift()!;
 
         if (p < n && arr[p] !== null) {
-            node.left = new TreeNode(arr[p]);
+            node.left = new TreeNode(arr[p] as number);
             q.push(node.left);
         }
         p++;
 
         if (p < n && arr[p] !== null) {
-            node.right = new TreeNode(arr[p]);
+            node.right = new TreeNode(arr[p] as number);
             q.push(node.right);
         }
         p++;
@@ -162,8 +162,8 @@ export function desTree(jsonStr: string): TreeNode | null {
     return desTreeAux(desTreeList(jsonStr));
 }
 
-function serTreeAux(root: TreeNode | null): number[] {
-    const result: number[] = [];
+function serTreeAux(root: TreeNode | null): (number | null)[] {
+    const result: (number | null)[] = [];
     if (root === null) {
         return [];
     }
@@ -215,7 +215,7 @@ function desLinkedListAux(arr: number[]): ListNode | null {
 }
 
 export function desLinkedList(jsonStr: string): ListNode | null {
-    return desLinkedListAux(desIntList(jsonStr));
+    return desLinkedListAux(desNumberList(jsonStr));
 }
 
 
@@ -231,6 +231,6 @@ function serLinkedListAux(head: ListNode | null): number[] {
 }
 
 export function serLinkedList(head: ListNode | null): string {
-    return serIntList(serLinkedListAux(head));
+    return serNumberList(serLinkedListAux(head));
 }
 
