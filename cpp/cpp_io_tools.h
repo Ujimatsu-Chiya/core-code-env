@@ -8,6 +8,24 @@
 const char* READ_PATH = "user.in";
 const char* WRITE_PATH = "user.out";
 
+void strip(char* str) {
+    int start = 0;
+    while (isspace((unsigned char)str[start])) {
+        start++;
+    }
+    int end = strlen(str) - 1;
+    while (end >= start && isspace((unsigned char)str[end])) {
+        end--;
+    }
+    int len = end - start + 1;
+    if (len > 0) {
+        memmove(str, str + start, len);
+        str[len] = '\0';
+    } else {
+        str[0] = '\0';
+    }
+}
+
 class StdinWrapper {
 private:
     FILE* inputFile;
@@ -32,6 +50,7 @@ public:
     char* read_line() {
         if (fgets(line, fileSize + 1, inputFile) != nullptr) {
             line[strcspn(line, "\n")] = '\0';
+            strip(line);
             return (line[0] != '\0') ? line : nullptr;
         }
         return nullptr;

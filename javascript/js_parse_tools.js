@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.desIntList = desIntList;
-exports.desInt = desInt;
+exports.desNumberList = desNumberList;
+exports.desNumber = desNumber;
 exports.desBool = desBool;
 exports.desString = desString;
-exports.desIntListList = desIntListList;
+exports.desNumberListList = desNumberListList;
 exports.desStringList = desStringList;
 exports.desBoolList = desBoolList;
 exports.desTreeList = desTreeList;
-exports.serInt = serInt;
+exports.serNumber = serNumber;
 exports.serBool = serBool;
 exports.serString = serString;
-exports.serIntList = serIntList;
-exports.serIntListList = serIntListList;
+exports.serNumberList = serNumberList;
+exports.serNumberListList = serNumberListList;
 exports.serStringList = serStringList;
 exports.serBoolList = serBoolList;
 exports.serTreeList = serTreeList;
@@ -20,52 +20,52 @@ exports.desTree = desTree;
 exports.serTree = serTree;
 exports.desLinkedList = desLinkedList;
 exports.serLinkedList = serLinkedList;
-var ts_type_node_1 = require("./ts_type_node");
-function desIntList(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+const ts_type_node_1 = require("./js_type_node");
+function desNumberList(jsonStr) {
+    const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
-    return parsed.map(function (item) {
+    return parsed.map(item => {
         if (typeof item !== "number") {
             throw new TypeError("Array contains non-number elements");
         }
         return item;
     });
 }
-function desInt(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+function desNumber(jsonStr) {
+    const parsed = JSON.parse(jsonStr);
     if (typeof parsed !== "number") {
         throw new TypeError("Input is not a valid number");
     }
     return parsed;
 }
 function desBool(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr);
     if (typeof parsed !== "boolean") {
         throw new TypeError("Input is not a valid boolean");
     }
     return parsed;
 }
 function desString(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr);
     if (typeof parsed !== "string") {
         throw new TypeError("Input is not a valid string");
     }
     return parsed;
 }
-function desIntListList(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+function desNumberListList(jsonStr) {
+    const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
-    return parsed.map(function (row) {
+    return parsed.map(row => {
         if (row === null)
-            return null;
+            return [];
         if (!Array.isArray(row)) {
             throw new TypeError("Row is not a valid array");
         }
-        return row.map(function (item) {
+        return row.map(item => {
             if (typeof item !== "number") {
                 throw new TypeError("Array contains non-number elements");
             }
@@ -74,11 +74,11 @@ function desIntListList(jsonStr) {
     });
 }
 function desStringList(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
-    return parsed.map(function (item) {
+    return parsed.map(item => {
         if (typeof item !== "string") {
             throw new TypeError("Array contains non-string elements");
         }
@@ -86,11 +86,11 @@ function desStringList(jsonStr) {
     });
 }
 function desBoolList(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
-    return parsed.map(function (item) {
+    return parsed.map(item => {
         if (typeof item !== "boolean") {
             throw new TypeError("Array contains non-boolean elements");
         }
@@ -98,18 +98,18 @@ function desBoolList(jsonStr) {
     });
 }
 function desTreeList(jsonStr) {
-    var parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr);
     if (!Array.isArray(parsed)) {
         throw new TypeError("Input is not a valid JSON array");
     }
-    return parsed.map(function (item) {
+    return parsed.map(item => {
         if (item !== null && typeof item !== "number") {
             throw new TypeError("Array contains non-number and non-null elements");
         }
         return item;
     });
 }
-function serInt(value) {
+function serNumber(value) {
     return JSON.stringify(value);
 }
 function serBool(value) {
@@ -118,10 +118,10 @@ function serBool(value) {
 function serString(value) {
     return JSON.stringify(value);
 }
-function serIntList(values) {
+function serNumberList(values) {
     return JSON.stringify(values);
 }
-function serIntListList(values) {
+function serNumberListList(values) {
     return JSON.stringify(values);
 }
 function serStringList(values) {
@@ -134,15 +134,15 @@ function serTreeList(values) {
     return JSON.stringify(values);
 }
 function desTreeAux(arr) {
-    var n = arr.length;
+    const n = arr.length;
     if (n === 0 || arr[0] === null) {
         return null;
     }
-    var root = new ts_type_node_1.TreeNode(arr[0]);
-    var q = [root];
-    var p = 1;
+    const root = new ts_type_node_1.TreeNode(arr[0]);
+    const q = [root];
+    let p = 1;
     while (p < n) {
-        var node = q.shift();
+        const node = q.shift();
         if (p < n && arr[p] !== null) {
             node.left = new ts_type_node_1.TreeNode(arr[p]);
             q.push(node.left);
@@ -160,14 +160,14 @@ function desTree(jsonStr) {
     return desTreeAux(desTreeList(jsonStr));
 }
 function serTreeAux(root) {
-    var result = [];
+    const result = [];
     if (root === null) {
         return [];
     }
-    var q = [root];
+    const q = [root];
     result.push(root.val);
     while (q.length > 0) {
-        var u = q.shift();
+        const u = q.shift();
         if (u.left !== null) {
             q.push(u.left);
             result.push(u.left.val);
@@ -192,25 +192,25 @@ function serTree(root) {
     return serTreeList(serTreeAux(root));
 }
 function desLinkedListAux(arr) {
-    var n = arr.length;
+    const n = arr.length;
     if (n === 0) {
         return null;
     }
-    var head = new ts_type_node_1.ListNode(arr[0]);
-    var tail = head;
-    for (var i = 1; i < n; i++) {
-        var p = new ts_type_node_1.ListNode(arr[i]);
+    const head = new ts_type_node_1.ListNode(arr[0]);
+    let tail = head;
+    for (let i = 1; i < n; i++) {
+        const p = new ts_type_node_1.ListNode(arr[i]);
         tail.next = p;
         tail = p;
     }
     return head;
 }
 function desLinkedList(jsonStr) {
-    return desLinkedListAux(desIntList(jsonStr));
+    return desLinkedListAux(desNumberList(jsonStr));
 }
 function serLinkedListAux(head) {
-    var result = [];
-    var p = head;
+    const result = [];
+    let p = head;
     while (p !== null) {
         result.push(p.val);
         p = p.next;
@@ -218,7 +218,5 @@ function serLinkedListAux(head) {
     return result;
 }
 function serLinkedList(head) {
-    return serIntList(serLinkedListAux(head));
+    return serNumberList(serLinkedListAux(head));
 }
-// var s = '[1,2,3,null, 5]'
-// console.log(serTree(desTree(s)))

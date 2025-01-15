@@ -4,6 +4,9 @@ from py_gen_main import py_test
 from cpp_gen_main import cpp_test
 from java_gen_main import java_test
 from c_gen_main import c_test
+from ts_gen_main import ts_test
+from js_gen_main import js_test
+
 import os
 
 def test(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
@@ -13,7 +16,9 @@ def test(function_name:str, params_type:List[TypeEnum], params_name:List[str], r
         'c': [c_test, to_snake_case, to_snake_case],
         'cpp': [cpp_test, to_snake_case, to_snake_case],
         'java':[java_test, to_camel_case, to_camel_case],
-        'py': [py_test, to_snake_case, to_snake_case]
+        'py': [py_test, to_snake_case, to_snake_case],
+        'ts':[ts_test, to_camel_case, to_camel_case],
+        'js':[js_test, to_camel_case, to_camel_case]
     }
     os.makedirs(RESULT, exist_ok=True)
     for lang, (lang_test, function_name_style, params_name_style) in operations.items():
