@@ -1,0 +1,13 @@
+package main
+
+import(
+    
+)
+
+func GetCPUTime() int64 {
+	var stats runtime.MemStats
+	runtime.ReadMemStats(&stats)
+	return int64(stats.PauseTotalNs)
+}
+
+// The user's code will be inserted below here.

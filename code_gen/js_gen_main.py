@@ -177,3 +177,11 @@ def js_test(function_name:str, params_type:List[TypeEnum], params_name:List[str]
         return 0, {'main_body.js' : solution_code, 'main_trailer.js' : trailer_code}
     finally:
         shutil.rmtree(TMP)
+
+if __name__ == '__main__':
+    params_type = [TypeEnum.INT, TypeEnum.LONG, TypeEnum.DOUBLE, TypeEnum.STRING, TypeEnum.INT_LIST,
+                   TypeEnum.INT_LIST_LIST, TypeEnum.DOUBLE_LIST, TypeEnum.STRING_LIST, TypeEnum.BOOL_LIST,
+                   TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
+    params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    return_type = TypeEnum.INT_LIST_LIST
+    print(js_test('solve', params_type, params_name, return_type))

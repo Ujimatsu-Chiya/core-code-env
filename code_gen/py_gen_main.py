@@ -87,7 +87,7 @@ def py_generate_solution_code(function_name:str, params_type:List[TypeEnum], par
     ]
     return "\n".join(lines)
 
-def py_generate_main_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+def py_generate_trailer_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
     params_num = len(params_name)
     lines_pre = []
     for i, (p_type, p_name) in enumerate(zip(params_type, params_name)):
@@ -98,14 +98,6 @@ def py_generate_main_code(function_name:str, params_type:List[TypeEnum], params_
                  f"p{i} = {des_func_name[p_type]}(json_str)"
             ]
     lines = [
-        'from py_io_tools import *',
-        'from py_parse_tools import *',
-        'from py_node_type import *',
-        'from solution import *',
-        'import time',
-        'import sys',
-        'import traceback'
-        '',
         '',
         'def run():',
         '    reader = StdinWrapper()',
@@ -146,10 +138,11 @@ def py_test(function_name:str, params_type:List[TypeEnum], params_name:List[str]
                 fp.write(json_default_val[p_type] + '\n')
 
         solution_code = py_generate_solution_code(function_name, params_type, params_name, return_type)
+        trailer_code = py_generate_trailer_code(function_name, params_type, params_name, return_type)
 
-        with open(os.path.join(TMP, 'solution.py'), 'w') as fp:
+        with open(os.path.join(TMP, 'main.py'), 'w') as fp:
             with open(os.path.join(PATH, 'py_header')) as fq:
-                fp.write(fq.read() + '\n' + solution_code)
+                fp.write(fq.read() + '\n' + solution_code + trailer_code)
     
         tmp_list = [filename for filename in os.listdir(PATH) if filename.startswith('py') and filename.endswith('.so')]
         current_dir = os.getcwd()
@@ -166,10 +159,7 @@ def py_test(function_name:str, params_type:List[TypeEnum], params_name:List[str]
                 src = os.path.join(PATH, filename)
                 dst = os.path.join(TMP, filename)
                 shutil.copy(src, dst)
-    
-        main_code = py_generate_main_code(function_name, params_type, params_name, return_type)
-        with open(os.path.join(TMP, 'main.py'), 'w') as fp:
-            fp.write(main_code)
+
     
         os.chdir(TMP)
         result = subprocess.run(['python3', 'main.py'],
@@ -188,7 +178,7 @@ def py_test(function_name:str, params_type:List[TypeEnum], params_name:List[str]
         if missing_files:
             return 1, f"Missing these files: {', '.join(missing_files)}"
         
-        return 0, {'solution_body.py' : solution_code, 'main.py' : main_code}
+        return 0, {'main_body.py' : solution_code, 'main_trailer.py' : trailer_code}
     finally:
         shutil.rmtree(TMP)
 
@@ -198,4 +188,4 @@ if __name__ == '__main__':
                    TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
     params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
     return_type = TypeEnum.INT_LIST_LIST
-    print(py_test('solve', params_type, params_name, return_type)[1])
+    print(py_test('solve', params_type, params_name, return_type))
