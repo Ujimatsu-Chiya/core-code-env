@@ -83,19 +83,20 @@ def _java_generate_signature(function_name:str, params_type:List[TypeEnum], para
 
 def java_generate_solution_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
     lines = [
-        'public class Solution{',
+        'class Solution{',
         f"    {_java_generate_signature(function_name, params_type, params_name, return_type)}{{",
         '        // write code here',
         f'        return {java_default_val[return_type]};',
         '    }',
-        '}'
+        '}',
+        ''
     ]
     return "\n".join(lines)
 
 
 
 
-def java_generate_main_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+def java_generate_trailer_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
     params_num = len(params_name)
     lines_pre = []
     for i, (p_type, p_name) in enumerate(zip(params_type, params_name)):
@@ -107,9 +108,6 @@ def java_generate_main_code(function_name:str, params_type:List[TypeEnum], param
                  f"{java_type[p_type]} p{i} = JavaParseTools.{des_func_name[p_type]}(jsonStr);"
             ]
     lines = [
-        'import java.io.*;', 
-        'import java.time.*;', 
-        'import java.util.*;', 
         '', 
         'public class Main {', 
         '',
@@ -161,16 +159,13 @@ def java_test(function_name:str, params_type:List[TypeEnum], params_name:List[st
             for p_type in params_type:
                 fp.write(json_default_val[p_type] + '\n')
 
-        PATH = 'java'
-    
+
         solution_code = java_generate_solution_code(function_name, params_type, params_name, return_type)
-        main_code = java_generate_main_code(function_name, params_type, params_name, return_type)
+        trailer_code = java_generate_trailer_code(function_name, params_type, params_name, return_type)
 
         with open(os.path.join(TMP, 'Main.java'), 'w') as fp:
-            fp.write(main_code)
-        
-        with open(os.path.join(TMP, 'Solution.java'), 'w') as fp:
-            fp.write(solution_code)
+            with open(os.path.join(PATH, 'java_header')) as fq:
+                fp.write(fq.read() + '\n' + solution_code + trailer_code)
     
         tmp_list = [filename for filename in os.listdir(PATH) if filename.startswith('libjava_') and filename.endswith('.so')]
         current_dir = os.getcwd()
@@ -215,7 +210,7 @@ def java_test(function_name:str, params_type:List[TypeEnum], params_name:List[st
         missing_files = [file for file in required_files if file not in files_in_directory]
         if missing_files:
             return 1, f"Missing these files: {', '.join(missing_files)}"
-        return 0, {'Solution.java' : solution_code, 'Main.java' : main_code}
+        return 0, {'MainBody.java' : solution_code, 'MainTrailer.java' : trailer_code}
     finally:
         shutil.rmtree(TMP)
 
@@ -225,4 +220,4 @@ if __name__ == '__main__':
                    TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
     params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
     return_type = TypeEnum.INT_LIST_LIST
-    print(java_test('solve', params_type, params_name, return_type)[1])
+    print(java_test('solve', params_type, params_name, return_type))
