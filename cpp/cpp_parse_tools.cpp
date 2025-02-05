@@ -1,6 +1,7 @@
 #include "cpp_parse_tools.h"
 #include <climits>
 #include <deque>
+#include <vector>
 
 static TreeNode *des_tree_aux(std::vector<int> arr)
 {

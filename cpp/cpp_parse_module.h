@@ -42,5 +42,5 @@ char* ser_tree_list(const std::vector<int>& values);
 
 #endif  // CPP_PARSE_MODULE_H
 
-// g++ -shared -o libcpp_parse_module.so -fPIC cpp_parse_module.cpp rapidjson_helper.cpp
+// g++ -shared -o libcpp_parse_module.so -fPIC cpp_parse_module.cpp ../rapidjson_helper.cpp
 // g++ -o main main.cpp -L. -lcpp_parse_module -Wl,-rpath=.
