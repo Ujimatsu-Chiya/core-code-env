@@ -1,111 +1,104 @@
 import os
 import shutil
 import subprocess
-from typing import List
-from utils import TypeEnum, json_default_val
+from dataclasses import dataclass
+from typing import List, Dict
+from utils import TypeEnum, json_default_val, TypeSpec, MethodDef, ClassDef
 
-java_type = {
-    TypeEnum.BOOL: 'boolean',
-    TypeEnum.INT: 'int',
-    TypeEnum.LONG: 'long',
-    TypeEnum.DOUBLE: 'double',
-    TypeEnum.STRING: 'String',
-    TypeEnum.INT_LIST: 'int[]',
-    TypeEnum.INT_LIST_LIST: 'int[][]',
-    TypeEnum.DOUBLE_LIST: 'double[]',
-    TypeEnum.STRING_LIST: 'String[]',
-    TypeEnum.BOOL_LIST: 'boolean[]',
-    TypeEnum.TREENODE: 'TreeNode',
-    TypeEnum.LISTNODE: 'ListNode',
-    TypeEnum.LONG_LIST: 'long[]'
-}
+JAVA_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
+    TypeEnum.BOOL: TypeSpec('boolean', 'false', 'desBool', 'serBool'),
+    TypeEnum.INT: TypeSpec('int', '0', 'desInt', 'serInt'),
+    TypeEnum.LONG: TypeSpec('long', '0L', 'desLong', 'serLong'),
+    TypeEnum.DOUBLE: TypeSpec('double', '0.0', 'desDouble', 'serDouble'),
+    TypeEnum.STRING: TypeSpec('String', '""', 'desString', 'serString'),
 
-java_default_val = {
-    TypeEnum.BOOL: 'false',
-    TypeEnum.INT: '0',
-    TypeEnum.LONG: '0L',
-    TypeEnum.DOUBLE: '0.0',
-    TypeEnum.STRING: '""',
-    TypeEnum.INT_LIST: 'null',
-    TypeEnum.INT_LIST_LIST: 'null',
-    TypeEnum.DOUBLE_LIST: 'null',
-    TypeEnum.STRING_LIST: 'null',
-    TypeEnum.BOOL_LIST: 'null',
-    TypeEnum.TREENODE: 'null',
-    TypeEnum.LISTNODE: 'null',
-    TypeEnum.LONG_LIST: 'null'
-}
+    TypeEnum.INT_LIST: TypeSpec('int[]', 'null', 'desIntList', 'serIntList'),
+    TypeEnum.INT_LIST_LIST: TypeSpec('int[][]', 'null', 'desIntListList', 'serIntListList'),
+    TypeEnum.DOUBLE_LIST: TypeSpec('double[]', 'null', 'desDoubleList', 'serDoubleList'),
+    TypeEnum.STRING_LIST: TypeSpec('String[]', 'null', 'desStringList', 'serStringList'),
+    TypeEnum.BOOL_LIST: TypeSpec('boolean[]', 'null', 'desBoolList', 'serBoolList'),
 
-
-des_func_name = {
-    TypeEnum.BOOL : 'desBool',
-    TypeEnum.INT : 'desInt',
-    TypeEnum.LONG : 'desLong',
-    TypeEnum.DOUBLE : 'desDouble',
-    TypeEnum.STRING: 'desString',
-    TypeEnum.INT_LIST: 'desIntList',
-    TypeEnum.INT_LIST_LIST: 'desIntListList',
-    TypeEnum.DOUBLE_LIST: 'desDoubleList',
-    TypeEnum.STRING_LIST: 'desStringList',
-    TypeEnum.BOOL_LIST: 'desBoolList',
-    TypeEnum.TREENODE: 'desTree',
-    TypeEnum.LISTNODE: 'desLinkedList',
-    TypeEnum.LONG_LIST : 'desLongList'
-}
-
-ser_func_name = {
-    TypeEnum.BOOL : 'serBool',
-    TypeEnum.INT : 'serInt',
-    TypeEnum.LONG : 'serLong',
-    TypeEnum.DOUBLE : 'serDouble',
-    TypeEnum.STRING: 'serString',
-    TypeEnum.INT_LIST: 'serIntList',
-    TypeEnum.INT_LIST_LIST: 'serIntListList',
-    TypeEnum.DOUBLE_LIST: 'serDoubleList',
-    TypeEnum.STRING_LIST: 'serStringList',
-    TypeEnum.BOOL_LIST: 'serBoolList',
-    TypeEnum.TREENODE: 'serTree',
-    TypeEnum.LISTNODE: 'serLinkedList',
-    TypeEnum.LONG_LIST : 'serLongList'
+    TypeEnum.TREENODE: TypeSpec('TreeNode', 'null', 'desTree', 'serTree'),
+    TypeEnum.LISTNODE: TypeSpec('ListNode', 'null', 'desLinkedList', 'serLinkedList'),
+    TypeEnum.LONG_LIST: TypeSpec('long[]', 'null', 'desLongList', 'serLongList'),
+    TypeEnum.NONE: TypeSpec('void', '', 'desNone', 'serNone'),
 }
 
 TIME_COST_PATH = 'time_cost.txt'
 
-def _java_generate_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
-    params_list = []
-    for p_type, p_name in zip(params_type, params_name):
-        p_type_str = java_type[p_type]
-        params_list.append(f'{p_type_str} {p_name}')
-    java_signature = f"public {java_type[return_type]} {function_name}({', '.join(params_list)})"
-    return java_signature
+
+@dataclass
+class JavaMethodDef(MethodDef):
+    def generate(self) -> str:
+        params_list = []
+        for p_type, p_name in zip(self.params_type, self.params_name):
+            p_type_str = JAVA_TYPE_SPECS[p_type].lang_type
+            params_list.append(f'{p_type_str} {p_name}')
+        java_signature = f"public {JAVA_TYPE_SPECS[return_type].lang_type} {self.function_name}({', '.join(params_list)})"
+        return java_signature
 
 
+@dataclass
+class JavaClassDef(ClassDef):
+    def __post_init__(self):
+        self.constructor.function_name = self.name
+        self.constructor.return_type = TypeEnum.NONE
+    def constructor_generate(self):
+        params_list: List[str] = []
+        for p_type, p_name in zip(self.constructor.params_type, self.constructor.params_name):
+            t = JAVA_TYPE_SPECS[p_type].lang_type
+            params_list.append(f"{t} {p_name}")
+        signature = f"public {self.name}({', '.join(params_list)})"
+        return signature
 
-def java_generate_solution_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+
+def java_generate_solution_code(method_def : JavaMethodDef):
     lines = [
         'class Solution{',
-        f"    {_java_generate_signature(function_name, params_type, params_name, return_type)}{{",
+        f"    {method_def.generate()}{{",
         '        // write code here',
-        f'        return {java_default_val[return_type]};',
+        f'        return {JAVA_TYPE_SPECS[return_type].default};',
         '    }',
         '}',
         ''
     ]
     return "\n".join(lines)
 
+def java_generate_system_code(class_def: JavaClassDef) -> str:
+    lines = [
+        f'class {class_def.name}{{',
+        f'    {class_def.constructor_generate()}{{',
+        f'        // write code here',
+        f'        return;',
+        f'    }}',
+        f''
+    ]
+    for method_def in class_def.methods:
+        lines += [
+            f'    {method_def.generate()}{{',
+            f'        // write code here',
+            f'        return {JAVA_TYPE_SPECS[method_def.return_type].default}',
+            f'    }}',
+            ''
+        ]
+    lines += [
+        f'}}\n'
+    ]
+    return "\n".join(lines)
 
 
 
-def java_generate_trailer_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+
+def java_generate_trailer_code(method_def : JavaMethodDef):
     params_num = len(params_name)
     lines_pre = []
-    for i, (p_type, p_name) in enumerate(zip(params_type, params_name)):
+    for i, (p_type, p_name) in enumerate(zip(method_def.params_type, method_def.params_name)):
             lines_pre += [
                  'jsonStr = reader.readLine();',
                  'if(jsonStr == null){',
                  '    break;' if i == 0 else f'    throw new IllegalArgumentException("Testcase is missing the required argument: `{p_name}`");',
                  '}',
-                 f"{java_type[p_type]} p{i} = JavaParseTools.{des_func_name[p_type]}(jsonStr);"
+                 f"{JAVA_TYPE_SPECS[p_type].lang_type} p{i} = JavaParseTools.{JAVA_TYPE_SPECS[p_type].des_func}(jsonStr);"
             ]
     lines = [
         '', 
@@ -121,12 +114,12 @@ def java_generate_trailer_code(function_name:str, params_type:List[TypeEnum], pa
         '\n'.join([' ' * 12 + s for s in lines_pre]),
         '            long startStamp = System.nanoTime();', 
         '', 
-        f'            {java_type[return_type]} result = new Solution().{function_name}({", ".join(f"p{x}" for x in range(params_num))});',
+        f'            {JAVA_TYPE_SPECS[method_def.return_type].lang_type} result = new Solution().{method_def.function_name}({", ".join(f"p{x}" for x in range(params_num))});',
         '', 
         '            long endStamp = System.nanoTime();', 
         '            totalTime += endStamp - startStamp;', 
         '', 
-        f'            writer.writeLine(JavaParseTools.{ser_func_name[return_type]}(result));', 
+        f'            writer.writeLine(JavaParseTools.{JAVA_TYPE_SPECS[return_type].ser_func}(result));',
         '            ', 
         '        }', 
         f'        try (BufferedWriter fp = new BufferedWriter(new FileWriter("{TIME_COST_PATH}"))) {{', 
@@ -149,7 +142,7 @@ def java_generate_trailer_code(function_name:str, params_type:List[TypeEnum], pa
     return "\n".join(lines)
 
 
-def java_test(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+def java_test(method_def):
     try:
         TMP = 'tmp'
         PATH = 'java'
@@ -160,8 +153,8 @@ def java_test(function_name:str, params_type:List[TypeEnum], params_name:List[st
                 fp.write(json_default_val[p_type] + '\n')
 
 
-        solution_code = java_generate_solution_code(function_name, params_type, params_name, return_type)
-        trailer_code = java_generate_trailer_code(function_name, params_type, params_name, return_type)
+        solution_code = java_generate_solution_code(method_def)
+        trailer_code = java_generate_trailer_code(method_def)
 
         with open(os.path.join(TMP, 'Main.java'), 'w') as fp:
             with open(os.path.join(PATH, 'java_header')) as fq:
@@ -220,4 +213,11 @@ if __name__ == '__main__':
                    TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
     params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
     return_type = TypeEnum.INT_LIST_LIST
-    print(java_test('solve', params_type, params_name, return_type))
+    # print(py_generate_trailer_code(MethodDef('solve', params_type, params_name, return_type)))
+    m1 = JavaMethodDef('solve', params_type, params_name, return_type)
+    m2 = JavaMethodDef('solve2', params_type, params_name, TypeEnum.INT)
+    m3 = JavaMethodDef('solve2', params_type, params_name, TypeEnum.INT)
+    # print(m2)
+    print(java_generate_system_code(JavaClassDef("System", m3, [m1, m2])))
+
+
