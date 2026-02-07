@@ -1,20 +1,24 @@
-from enum import Enum
+from dataclasses import dataclass
+from enum import Enum, auto
 import re
+from typing import List
+
 
 class TypeEnum(Enum):
-    BOOL = 'bool'
-    BOOL_LIST = 'bool[]'
-    INT = 'int'
-    LONG = 'long'
-    LONG_LIST = 'long[]'
-    DOUBLE = 'double'
-    STRING = 'string'
-    INT_LIST = 'int[]'
-    INT_LIST_LIST = 'int[][]'
-    DOUBLE_LIST = 'double[]'
-    STRING_LIST = 'string[]'
-    TREENODE = 'TreeNode'
-    LISTNODE = 'ListNode'
+    BOOL = auto()
+    INT = auto()
+    LONG = auto()
+    DOUBLE = auto()
+    STRING = auto()
+    INT_LIST = auto()
+    INT_LIST_LIST = auto()
+    DOUBLE_LIST = auto()
+    STRING_LIST = auto()
+    BOOL_LIST = auto()
+    TREENODE = auto()
+    LISTNODE = auto()
+    LONG_LIST = auto()
+    NONE = auto()
 
     @staticmethod
     def get_base_type(p_type: 'TypeEnum'):
@@ -44,9 +48,16 @@ class TypeEnum(Enum):
             TypeEnum.DOUBLE_LIST: 1,
             TypeEnum.STRING_LIST: 1,
             TypeEnum.TREENODE: 0,
-            TypeEnum.LISTNODE: 0
+            TypeEnum.LISTNODE: 0,
+            TypeEnum.NONE: -1
         }[p_type]
 
+@dataclass(frozen=True)
+class TypeSpec:
+    lang_type: str
+    default: str
+    des_func: str
+    ser_func: str
 
 
 def split_pascal_case(s):
@@ -94,13 +105,37 @@ json_default_val = {
     TypeEnum.INT : '0',
     TypeEnum.LONG : '0',
     TypeEnum.DOUBLE : '0.0',
-    TypeEnum.STRING: '"a"',
+    TypeEnum.STRING: '"s"',
     TypeEnum.INT_LIST: '[1]',
-    TypeEnum.INT_LIST_LIST: '[[1]]',
+    TypeEnum.INT_LIST_LIST: '[[1,2],[3,4]]',
     TypeEnum.DOUBLE_LIST: '[1.0]',
     TypeEnum.STRING_LIST: '["a"]',
     TypeEnum.BOOL_LIST: '[false, true]',
     TypeEnum.TREENODE: '[1,null,2]',
     TypeEnum.LISTNODE: '[1,2]',
-    TypeEnum.LONG_LIST : '[1]'
+    TypeEnum.LONG_LIST : '[1]',
+    TypeEnum.NONE : 'null'
 }
+
+@dataclass
+class MethodDef:
+    function_name: str
+    params_type: List[TypeEnum]
+    params_name: List[str]
+    return_type: TypeEnum
+
+    def generate(self) -> str:
+        raise NotImplementedError()
+
+@dataclass
+class ClassDef:
+    """用来描述一个类具有哪些方法"""
+    name: str
+    constructor: MethodDef
+    methods: List[MethodDef]
+
+    def __post_init__(self):
+        raise NotImplementedError()
+
+    def constructor_generate(self):
+        raise NotImplementedError()

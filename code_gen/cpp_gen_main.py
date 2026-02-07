@@ -1,106 +1,104 @@
 import os
 import shutil
 import subprocess
-from typing import List
-from utils import TypeEnum, json_default_val
+from dataclasses import dataclass
+from typing import Dict, List
 
-cpp_type = {
-    TypeEnum.BOOL: 'bool',
-    TypeEnum.INT: 'int',
-    TypeEnum.LONG: 'long long',
-    TypeEnum.DOUBLE: 'double',
-    TypeEnum.STRING: 'string',
-    TypeEnum.INT_LIST: 'vector<int>',
-    TypeEnum.INT_LIST_LIST: 'vector<vector<int>>',
-    TypeEnum.DOUBLE_LIST: 'vector<double>',
-    TypeEnum.STRING_LIST: 'vector<string>',
-    TypeEnum.BOOL_LIST: 'vector<bool>',
-    TypeEnum.TREENODE: 'TreeNode*',
-    TypeEnum.LISTNODE: 'ListNode*',
-    TypeEnum.LONG_LIST: 'vector<long long>'
-}
+from utils import TypeEnum, TypeSpec, MethodDef, json_default_val, ClassDef
 
-cpp_default_val = {
-    TypeEnum.BOOL: 'false',
-    TypeEnum.INT: '0',
-    TypeEnum.LONG: '0',
-    TypeEnum.DOUBLE: '0.0',
-    TypeEnum.STRING: '""',
-    TypeEnum.INT_LIST: 'vector<int>()',
-    TypeEnum.INT_LIST_LIST: 'vector<vector<int>>()',
-    TypeEnum.DOUBLE_LIST: 'vector<double>()',
-    TypeEnum.STRING_LIST: 'vector<string>()',
-    TypeEnum.BOOL_LIST: 'vector<bool>()',
-    TypeEnum.TREENODE: 'nullptr',
-    TypeEnum.LISTNODE: 'nullptr',
-    TypeEnum.LONG_LIST: 'vector<long long>()'
-}
-
-des_func_name = {
-    TypeEnum.BOOL : 'des_bool',
-    TypeEnum.INT : 'des_int',
-    TypeEnum.LONG : 'des_long',
-    TypeEnum.DOUBLE : 'des_double',
-    TypeEnum.STRING: 'des_string',
-    TypeEnum.INT_LIST: 'des_int_list',
-    TypeEnum.INT_LIST_LIST: 'des_int_list_list',
-    TypeEnum.DOUBLE_LIST: 'des_double_list',
-    TypeEnum.STRING_LIST: 'des_string_list',
-    TypeEnum.BOOL_LIST: 'des_bool_list',
-    TypeEnum.TREENODE: 'des_tree',
-    TypeEnum.LISTNODE: 'des_linked_list',
-    TypeEnum.LONG_LIST : 'des_long_list'
-}
-
-ser_func_name = {
-    TypeEnum.BOOL : 'ser_bool',
-    TypeEnum.INT : 'ser_int',
-    TypeEnum.LONG : 'ser_long',
-    TypeEnum.DOUBLE : 'ser_double',
-    TypeEnum.STRING: 'ser_string',
-    TypeEnum.INT_LIST: 'ser_int_list',
-    TypeEnum.INT_LIST_LIST: 'ser_int_list_list',
-    TypeEnum.DOUBLE_LIST: 'ser_double_list',
-    TypeEnum.STRING_LIST: 'ser_string_list',
-    TypeEnum.BOOL_LIST: 'ser_bool_list',
-    TypeEnum.TREENODE: 'ser_tree',
-    TypeEnum.LISTNODE: 'ser_linked_list',
-    TypeEnum.LONG_LIST : 'ser_long_list'
+CPP_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
+    TypeEnum.BOOL: TypeSpec('bool', 'false', 'des_bool', 'ser_bool'),
+    TypeEnum.INT: TypeSpec('int', '0', 'des_int', 'ser_int'),
+    TypeEnum.LONG: TypeSpec('long long', '0', 'des_long', 'ser_long'),
+    TypeEnum.DOUBLE: TypeSpec('double', '0.0', 'des_double', 'ser_double'),
+    TypeEnum.STRING: TypeSpec('string', '""', 'des_string', 'ser_string'),
+    TypeEnum.INT_LIST: TypeSpec('vector<int>', 'vector<int>()', 'des_int_list', 'ser_int_list'),
+    TypeEnum.INT_LIST_LIST: TypeSpec('vector<vector<int>>', 'vector<vector<int>>()', 'des_int_list_list', 'ser_int_list_list'),
+    TypeEnum.DOUBLE_LIST: TypeSpec('vector<double>', 'vector<double>()', 'des_double_list', 'ser_double_list'),
+    TypeEnum.STRING_LIST: TypeSpec('vector<string>', 'vector<string>()', 'des_string_list', 'ser_string_list'),
+    TypeEnum.BOOL_LIST: TypeSpec('vector<bool>', 'vector<bool>()', 'des_bool_list', 'ser_bool_list'),
+    TypeEnum.TREENODE: TypeSpec('TreeNode*', 'nullptr', 'des_tree', 'ser_tree'),
+    TypeEnum.LISTNODE: TypeSpec('ListNode*', 'nullptr', 'des_linked_list', 'ser_linked_list'),
+    TypeEnum.LONG_LIST: TypeSpec('vector<long long>', 'vector<long long>()', 'des_long_list', 'ser_long_list'),
+    TypeEnum.NONE: TypeSpec('void', '/*none*/', 'des_none', 'ser_none'),
 }
 
 TIME_COST_PATH = 'time_cost.txt'
 
-def _cpp_generate_signature(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum) -> str:
-    params_list = []
-    for p_type, p_name in zip(params_type, params_name):
-        p_type_str = cpp_type[p_type]
-        params_list.append(f'{p_type_str} {p_name}')
-    cpp_signature = f"{cpp_type[return_type]} {function_name}({', '.join(params_list)})"
-    return cpp_signature
+@dataclass
+class CppMethodDef(MethodDef):
+    def generate(self) -> str:
+        params_list: List[str] = []
+        for p_type, p_name in zip(self.params_type, self.params_name):
+            t = CPP_TYPE_SPECS[p_type].lang_type
+            params_list.append(f"{t} {p_name}")
+        ret_type = CPP_TYPE_SPECS[self.return_type].lang_type
+        signature = f"{ret_type} {self.function_name}({', '.join(params_list)})"
+        return signature
 
-def cpp_generate_solution_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+@dataclass
+class CppClassDef(ClassDef):
+    def __post_init__(self):
+        self.constructor.function_name = self.name
+        self.constructor.return_type = TypeEnum.NONE
+    def constructor_generate(self):
+        params_list: List[str] = []
+        for p_type, p_name in zip(self.constructor.params_type, self.constructor.params_name):
+            t = CPP_TYPE_SPECS[p_type].lang_type
+            params_list.append(f"{t} {p_name}")
+        signature = f"{self.name}({', '.join(params_list)})"
+        return signature
+
+
+TIME_COST_PATH = 'time_cost.txt'
+
+def cpp_generate_system_code(class_def: CppClassDef) -> str:
+    lines = [
+        f'class {class_def.name}{{',
+        f'public:',
+        f'    {class_def.constructor_generate()}{{',
+        f'        // write code here',
+        f'        return;',
+        f'    }}',
+        f''
+    ]
+    for method_def in class_def.methods:
+        lines += [
+            f'    {method_def.generate()}{{',
+            f'        // write code here',
+            f'        return {CPP_TYPE_SPECS[method_def.return_type].default}',
+            f'    }}',
+            ''
+        ]
+    lines += [
+        f'}};\n'
+    ]
+    return "\n".join(lines)
+
+
+def cpp_generate_solution_code(method_def : CppMethodDef):
     lines = [
         'class Solution{',
         'public:',
-        f"    {_cpp_generate_signature(function_name, params_type, params_name, return_type)}{{",
+        f"    {method_def.generate()}{{",
         '        // write code here',
-        f'        return {cpp_default_val[return_type]};',
+        f'        return {CPP_TYPE_SPECS[method_def.return_type].default};',
         '    }',
         '};'
     ]
     return "\n".join(lines)
 
 
-def cpp_generate_trailer_code(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+def cpp_generate_trailer_code(method_def : CppMethodDef):
     params_num = len(params_name)
     lines_pre = []
-    for i, (p_type, p_name) in enumerate(zip(params_type, params_name)):
+    for i, (p_type, p_name) in enumerate(zip(method_def.params_type, method_def.params_name)):
             lines_pre += [
                  'json_str = reader.read_line();',
                  'if(json_str == nullptr){',
                  '    break;' if i == 0 else f'    throw std::invalid_argument("Testcase is missing the required argument: `{p_name}`");',
                  '}',
-                 f"{cpp_type[p_type]} p{i} = {des_func_name[p_type]}(json_str);"
+                 f"{CPP_TYPE_SPECS[p_type]} p{i} = {CPP_TYPE_SPECS[p_type].des_func}(json_str);"
             ]
     lines = [
         '',
@@ -114,10 +112,10 @@ def cpp_generate_trailer_code(function_name:str, params_type:List[TypeEnum], par
         '\n'.join([' ' * 8 + s for s in lines_pre]),
         '',
         '        unsigned long long start_stamp = __get_cpu_time();',
-        f'        {cpp_type[return_type]} result = Solution().{function_name}({", ".join(f"p{x}" for x in range(params_num))});',
+        f'        {CPP_TYPE_SPECS[method_def.return_type]} result = Solution().{method_def.function_name}({", ".join(f"p{x}" for x in range(params_num))});',
         '        unsigned long long end_stamp = __get_cpu_time();',
         '        total_time += (end_stamp - start_stamp);',
-        f'        char *result_str = {ser_func_name[return_type]}(result);',
+        f'        char *result_str = {CPP_TYPE_SPECS[method_def.return_type].lang_type}(result);',
         '        writer.write_line(result_str);',
         '        delete[] result_str;',
         '    }',
@@ -139,7 +137,7 @@ def cpp_generate_trailer_code(function_name:str, params_type:List[TypeEnum], par
 
     return "\n".join(lines)
 
-def cpp_test(function_name:str, params_type:List[TypeEnum], params_name:List[str], return_type:TypeEnum):
+def cpp_test(method_def : CppMethodDef):
     try:
         TMP = 'tmp'
         PATH = 'cpp'
@@ -151,8 +149,8 @@ def cpp_test(function_name:str, params_type:List[TypeEnum], params_name:List[str
 
         
     
-        solution_code = cpp_generate_solution_code(function_name, params_type, params_name, return_type)
-        trailer_code = cpp_generate_trailer_code(function_name, params_type, params_name, return_type)
+        solution_code = cpp_generate_solution_code(method_def)
+        trailer_code = cpp_generate_trailer_code(method_def)
 
         with open(os.path.join(TMP, 'main.cpp'), 'w') as fp:
             with open(os.path.join(PATH, 'cpp_header')) as fq:
@@ -208,4 +206,11 @@ if __name__ == '__main__':
                    TypeEnum.BOOL, TypeEnum.TREENODE, TypeEnum.LISTNODE]
     params_name = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
     return_type = TypeEnum.INT_LIST_LIST
-    print(cpp_test('solve', params_type, params_name, return_type)[1])
+    m1 = CppMethodDef('solve', params_type, params_name, return_type)
+    print(cpp_generate_solution_code(m1))
+    m1 = CppMethodDef('solve', params_type, params_name, return_type)
+    m2 = CppMethodDef('solve2', params_type, params_name, TypeEnum.INT)
+    m3 = CppMethodDef('solve2', params_type, params_name, TypeEnum.INT)
+    # print(m2)
+    print(cpp_generate_system_code(CppClassDef("System", m3, [m1, m2])))
+

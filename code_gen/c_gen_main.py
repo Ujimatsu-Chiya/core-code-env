@@ -17,7 +17,8 @@ c_type = {
     TypeEnum.BOOL_LIST: 'bool*',
     TypeEnum.TREENODE: 'struct TreeNode*',
     TypeEnum.LISTNODE: 'struct ListNode*',
-    TypeEnum.LONG_LIST: 'long long*'
+    TypeEnum.LONG_LIST: 'long long*',
+    TypeEnum.NONE: 'NULL'
 }
 
 c_default_val = {
@@ -33,7 +34,8 @@ c_default_val = {
     TypeEnum.BOOL_LIST: 'NULL',
     TypeEnum.TREENODE: 'NULL',
     TypeEnum.LISTNODE: 'NULL',
-    TypeEnum.LONG_LIST: 'NULL'
+    TypeEnum.LONG_LIST: 'NULL',
+    TypeEnum.NONE: 'NULL'
 }
 
 
@@ -51,6 +53,8 @@ des_func_name = {
     TypeEnum.TREENODE: 'des_tree',
     TypeEnum.LISTNODE: 'des_linked_list',
     TypeEnum.LONG_LIST : 'des_long_list'
+
+
 }
 
 ser_func_name = {
