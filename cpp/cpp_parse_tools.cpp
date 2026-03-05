@@ -32,7 +32,7 @@ static TreeNode *des_tree_aux(std::vector<int> arr)
     return root;
 }
 
-TreeNode *des_tree(const char *json_str)
+TreeNode *des_tree(const std::string& json_str)
 {
     std::vector<int> arr = des_tree_list(json_str);
     return des_tree_aux(arr);
@@ -85,7 +85,7 @@ static std::vector<int> ser_tree_aux(TreeNode *root)
     return result;
 }
 
-char *ser_tree(TreeNode *root)
+std::string ser_tree(TreeNode *root)
 {
     std::vector<int> result = ser_tree_aux(root);
     return ser_tree_list(result);
@@ -109,7 +109,7 @@ static ListNode *des_linked_list_aux(std::vector<int> arr)
     return head;
 }
 
-ListNode *des_linked_list(const char *json_str)
+ListNode *des_linked_list(const std::string& json_str)
 {
     std::vector<int> arr = des_int_list(json_str);
     return des_linked_list_aux(arr);
@@ -135,7 +135,7 @@ static std::vector<int> ser_linked_list_aux(ListNode *head)
     return result;
 }
 
-char *ser_linked_list(ListNode *head)
+std::string ser_linked_list(ListNode *head)
 {
     std::vector<int> result = ser_linked_list_aux(head);
     return ser_int_list(result);
