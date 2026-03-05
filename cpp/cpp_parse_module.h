@@ -6,41 +6,42 @@
 #include <string>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-std::vector<int> des_int_list(const char* json_str);
-int des_int(const char* json_str);
-long long des_long(const char* json_str);
-bool des_bool(const char* json_str);
-std::string des_string(const char* json_str);
-std::vector<long long> des_long_list(const char* json_str);
-std::vector<std::vector<int>> des_int_list_list(const char* json_str);
-std::vector<std::string> des_string_list(const char* json_str);
-std::vector<bool> des_bool_list(const char* json_str);
-double des_double(const char* json_str);
-std::vector<double> des_double_list(const char* json_str);
-std::vector<int> des_tree_list(const char* json_str);
+    std::vector<int> des_int_list(const std::string &json_str);
+    int des_int(const std::string &json_str);
+    long long des_long(const std::string &json_str);
+    bool des_bool(const std::string &json_str);
+    std::string des_string(const std::string &json_str);
+    std::vector<long long> des_long_list(const std::string &json_str);
+    std::vector<std::vector<int>> des_int_list_list(const std::string &json_str);
+    std::vector<std::string> des_string_list(const std::string &json_str);
+    std::vector<bool> des_bool_list(const std::string &json_str);
+    double des_double(const std::string &json_str);
+    std::vector<double> des_double_list(const std::string &json_str);
+    std::vector<int> des_tree_list(const std::string &json_str);
 
-// 序列化函数，返回char*类型
-char* ser_int(int value);
-char* ser_long(long long value);
-char* ser_bool(bool value);
-char* ser_string(std::string value);
-char* ser_int_list(const std::vector<int>& values);
-char* ser_long_list(const std::vector<long long>& values);
-char* ser_int_list_list(const std::vector<std::vector<int>>& values);
-char* ser_string_list(const std::vector<std::string>& values);
-char* ser_bool_list(const std::vector<bool>& values);
-char* ser_double(double value);
-char* ser_double_list(const std::vector<double>& values);
-char* ser_tree_list(const std::vector<int>& values);
+    // 序列化函数，返回string类型
+    std::string ser_int(int value);
+    std::string ser_long(long long value);
+    std::string ser_bool(bool value);
+    std::string ser_string(const std::string &value);
+    std::string ser_int_list(const std::vector<int> &values);
+    std::string ser_long_list(const std::vector<long long> &values);
+    std::string ser_int_list_list(const std::vector<std::vector<int>> &values);
+    std::string ser_string_list(const std::vector<std::string> &values);
+    std::string ser_bool_list(const std::vector<bool> &values);
+    std::string ser_double(double value);
+    std::string ser_double_list(const std::vector<double> &values);
+    std::string ser_tree_list(const std::vector<int> &values);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CPP_PARSE_MODULE_H
+#endif // CPP_PARSE_MODULE_H
 
 // g++ -shared -o libcpp_parse_module.so -fPIC cpp_parse_module.cpp ../rapidjson_helper.cpp
 // g++ -o main main.cpp -L. -lcpp_parse_module -Wl,-rpath=.

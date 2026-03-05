@@ -66,7 +66,7 @@ def cpp_generate_system_code(class_def: CppClassDef) -> str:
         lines += [
             f'    {method_def.generate()}{{',
             f'        // write code here',
-            f'        return {CPP_TYPE_SPECS[method_def.return_type].default}',
+            f'        return {CPP_TYPE_SPECS[method_def.return_type].default};',
             f'    }}',
             ''
         ]
@@ -95,29 +95,28 @@ def cpp_generate_trailer_code(method_def : CppMethodDef):
     for i, (p_type, p_name) in enumerate(zip(method_def.params_type, method_def.params_name)):
             lines_pre += [
                  'json_str = reader.read_line();',
-                 'if(json_str == nullptr){',
+                 'if(json_str.empty()){',
                  '    break;' if i == 0 else f'    throw std::invalid_argument("Testcase is missing the required argument: `{p_name}`");',
                  '}',
-                 f"{CPP_TYPE_SPECS[p_type]} p{i} = {CPP_TYPE_SPECS[p_type].des_func}(json_str);"
+                 f"{CPP_TYPE_SPECS[p_type].lang_type} p{i} = {CPP_TYPE_SPECS[p_type].des_func}(json_str);"
             ]
     lines = [
         '',
         'void run() {',
         '    StdinWrapper reader;',
         '    StdoutWrapper writer;',
-        '    char *json_str = nullptr;',
+        '    string json_str;',
         '    clock_t total_time = 0;',
         '    while (true) {',
         '',
         '\n'.join([' ' * 8 + s for s in lines_pre]),
         '',
         '        unsigned long long start_stamp = __get_cpu_time();',
-        f'        {CPP_TYPE_SPECS[method_def.return_type]} result = Solution().{method_def.function_name}({", ".join(f"p{x}" for x in range(params_num))});',
+        f'        {CPP_TYPE_SPECS[method_def.return_type].lang_type} result = Solution().{method_def.function_name}({", ".join(f"p{x}" for x in range(params_num))});',
         '        unsigned long long end_stamp = __get_cpu_time();',
         '        total_time += (end_stamp - start_stamp);',
-        f'        char *result_str = {CPP_TYPE_SPECS[method_def.return_type].lang_type}(result);',
+        f'        string result_str = {CPP_TYPE_SPECS[method_def.return_type].ser_func}(result);',
         '        writer.write_line(result_str);',
-        '        delete[] result_str;',
         '    }',
         '    ',
         f'    std::ofstream fp("{TIME_COST_PATH}");',
@@ -213,4 +212,4 @@ if __name__ == '__main__':
     m3 = CppMethodDef('solve2', params_type, params_name, TypeEnum.INT)
     # print(m2)
     print(cpp_generate_system_code(CppClassDef("System", m3, [m1, m2])))
-
+    print(cpp_generate_trailer_code(m1))
