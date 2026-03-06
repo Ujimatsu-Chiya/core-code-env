@@ -3,6 +3,7 @@
 #include <deque>
 #include <vector>
 
+// Build a binary tree from level-order values, where INT_MIN means null.
 static TreeNode *des_tree_aux(std::vector<int> arr)
 {
     int n = arr.size();
@@ -32,8 +33,9 @@ static TreeNode *des_tree_aux(std::vector<int> arr)
     return root;
 }
 
-TreeNode *des_tree(const std::string& json_str)
+TreeNode *des_tree(const std::string &json_str)
 {
+    // des_tree_list maps JSON null -> INT_MIN.
     std::vector<int> arr = des_tree_list(json_str);
     return des_tree_aux(arr);
 }
@@ -49,6 +51,7 @@ void delete_tree(TreeNode *root)
     delete root;
 }
 
+// Serialize a tree into level-order with INT_MIN placeholders.
 static std::vector<int> ser_tree_aux(TreeNode *root)
 {
     if (root == nullptr)
@@ -78,6 +81,7 @@ static std::vector<int> ser_tree_aux(TreeNode *root)
             result.push_back(INT_MIN);
         }
     }
+    // Trim trailing nulls to match canonical LeetCode output.
     while (!result.empty() && result.back() == INT_MIN)
     {
         result.pop_back();
@@ -109,7 +113,7 @@ static ListNode *des_linked_list_aux(std::vector<int> arr)
     return head;
 }
 
-ListNode *des_linked_list(const std::string& json_str)
+ListNode *des_linked_list(const std::string &json_str)
 {
     std::vector<int> arr = des_int_list(json_str);
     return des_linked_list_aux(arr);
@@ -140,5 +144,3 @@ std::string ser_linked_list(ListNode *head)
     std::vector<int> result = ser_linked_list_aux(head);
     return ser_int_list(result);
 }
-
-// g++ -shared -o libcpp_parse_tools.so -fPIC cpp_parse_tools.cpp cpp_parse_module.cpp ../rapidjson_helper.cpp 

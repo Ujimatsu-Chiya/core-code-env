@@ -1,15 +1,17 @@
 #ifndef CPP_IO_TOOLS_H
 #define CPP_IO_TOOLS_H
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <algorithm>
 #include <cctype>
+#include <fstream>
+#include <iostream>
+#include <string>
 
+// Fixed IO files used by generated runners.
 const char *READ_PATH = "user.in";
 const char *WRITE_PATH = "user.out";
 
+// Thin line-based reader over user.in.
 class StdinWrapper
 {
 private:
@@ -26,6 +28,7 @@ public:
         }
     }
 
+    // Returns empty string on EOF.
     std::string read_line()
     {
         std::string line;
@@ -45,6 +48,7 @@ public:
     }
 };
 
+// Thin line-based writer over user.out.
 class StdoutWrapper
 {
 private:
