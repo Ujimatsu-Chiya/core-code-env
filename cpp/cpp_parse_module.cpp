@@ -1,8 +1,10 @@
+// C++ wrappers that convert raw C allocations into std::string/std::vector APIs.
 #include <vector>
 #include <stdexcept>
 #include "../rapidjson_helper.h"
 #include "cpp_parse_module.h"
 
+// Take ownership of C heap string and convert to std::string.
 static std::string from_owned_cstr(char *raw)
 {
     if (!raw)
@@ -192,6 +194,43 @@ std::vector<int> des_tree_list(const std::string &json_str)
     return result;
 }
 
+// Deserialize system-design params as raw JSON fragments per argument.
+std::vector<std::vector<std::string>> des_json_value_list_list(const std::string &json_str)
+{
+    size_t rows = 0;
+    size_t *cols = nullptr;
+    char ***raw_values = des_src_json_value_list_list(json_str.c_str(), &rows, &cols);
+    if (!raw_values)
+    {
+        throw std::invalid_argument("Error parsing JSON or invalid json value list list.");
+    }
+
+    std::vector<std::vector<std::string>> result;
+    try
+    {
+        result.reserve(rows);
+        for (size_t i = 0; i < rows; ++i)
+        {
+            std::vector<std::string> row;
+            row.reserve(cols[i]);
+            for (size_t j = 0; j < cols[i]; ++j)
+            {
+                row.emplace_back(raw_values[i][j]);
+            }
+            result.push_back(std::move(row));
+        }
+    }
+    catch (...)
+    {
+        delete_src_json_value_list_list(raw_values, rows, cols);
+        delete[] cols;
+        throw;
+    }
+
+    delete_src_json_value_list_list(raw_values, rows, cols);
+    delete[] cols;
+    return result;
+}
 std::string ser_int(int value)
 {
     return from_owned_cstr(ser_src_int(value));
@@ -323,3 +362,6 @@ std::string ser_tree_list(const std::vector<int> &values)
     delete[] tree_array; // Clean up memory
     return from_owned_cstr(raw);
 }
+
+
+
