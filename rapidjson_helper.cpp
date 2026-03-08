@@ -746,5 +746,3 @@ char *ser_src_tree_list(const int *values, size_t size)
     }
     return result;
 }
-
-
