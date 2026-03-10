@@ -18,6 +18,21 @@ from py_gen_common import (
 )
 
 
+def _generate_api_usage_comment(class_def: PyClassDef) -> str:
+    ctor_args = ", ".join(class_def.constructor.params_name)
+    lines = [
+        f"# Your {class_def.name} object will be instantiated and called as such:",
+        f"# obj = {class_def.name}({ctor_args})",
+    ]
+    for idx, method in enumerate(class_def.methods, start=1):
+        m_args = ", ".join(method.params_name)
+        if method.return_type == TypeEnum.NONE:
+            lines.append(f"# obj.{method.function_name}({m_args})")
+        else:
+            lines.append(f"# result_{idx} = obj.{method.function_name}({m_args})")
+    return "\n".join(lines)
+
+
 def py_generate_system_code(class_def: PyClassDef) -> str:
     lines = [
         f"class {class_def.name}:",
@@ -37,6 +52,10 @@ def py_generate_system_code(class_def: PyClassDef) -> str:
             ),
             "",
         ]
+    lines += [
+        "",
+        _generate_api_usage_comment(class_def),
+    ]
     return "\n".join(lines)
 
 
@@ -211,4 +230,3 @@ def py_system_test(
         return 0, {"main_body.py": solution_code, "main_trailer.py": trailer_code}
     finally:
         shutil.rmtree(TMP_DIR, ignore_errors=True)
-

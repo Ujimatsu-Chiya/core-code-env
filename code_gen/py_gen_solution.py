@@ -29,8 +29,35 @@ def py_generate_solution_code(method_def: PyMethodDef) -> str:
     return "\n".join(lines)
 
 
+def _py_generate_driver_code(method_def: PyMethodDef) -> str:
+    helper_params = ", ".join(f"param_{idx + 1}" for idx in range(len(method_def.params_type)))
+    helper_args = ", ".join(f"param_{idx + 1}" for idx in range(len(method_def.params_type)))
+    helper_signature = "    def __helper__(self"
+    if helper_params:
+        helper_signature += f", {helper_params}"
+    helper_signature += "):"
+
+    if method_def.return_type == TypeEnum.NONE:
+        helper_body = [
+            f"        Solution().{method_def.function_name}({helper_args})",
+        ]
+    else:
+        helper_body = [
+            f"        ret = Solution().{method_def.function_name}({helper_args})",
+            "        return ret",
+        ]
+
+    lines = [
+        "class __DriverSolution__:",
+        helper_signature,
+        *helper_body,
+    ]
+    return "\n".join(lines)
+
+
 def py_generate_trailer_code(method_def: PyMethodDef):
     params_num = len(method_def.params_name)
+    driver_code = _py_generate_driver_code(method_def)
     lines_pre = []
     for i, (p_type, p_name) in enumerate(zip(method_def.params_type, method_def.params_name)):
         lines_pre += [
@@ -42,13 +69,15 @@ def py_generate_trailer_code(method_def: PyMethodDef):
 
     args = ", ".join(f"p{x}" for x in range(params_num))
     if method_def.return_type == TypeEnum.NONE:
-        invoke_lines = [f"        Solution().{method_def.function_name}({args})"]
+        invoke_lines = [f"        __DriverSolution__().__helper__({args})"]
         output_lines = ['        writer.write_line("null")']
     else:
-        invoke_lines = [f"        result = Solution().{method_def.function_name}({args})"]
+        invoke_lines = [f"        result = __DriverSolution__().__helper__({args})"]
         output_lines = [f"        writer.write_line({PY_TYPE_SPECS[method_def.return_type].ser_func}(result))"]
 
     lines = [
+        "",
+        driver_code,
         "",
         "def run():",
         "    reader = StdinWrapper()",

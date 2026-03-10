@@ -19,6 +19,28 @@ from cpp_gen_common import (
 )
 
 
+def _generate_api_usage_comment(class_def: CppClassDef) -> str:
+    ctor_args = ", ".join(class_def.constructor.params_name)
+    lines = [
+        "/**",
+        f" * Your {class_def.name} object will be instantiated and called as such:",
+        f" * {class_def.name}* obj = new {class_def.name}({ctor_args});",
+    ]
+    for idx, method in enumerate(class_def.methods, start=1):
+        m_args = ", ".join(method.params_name)
+        if method.return_type == TypeEnum.NONE:
+            lines.append(f" * obj->{method.function_name}({m_args});")
+        else:
+            lines.append(
+                f" * {CPP_TYPE_SPECS[method.return_type].lang_type} result_{idx} = obj->{method.function_name}({m_args});"
+            )
+    lines += [
+        " * delete obj;",
+        " */",
+    ]
+    return "\n".join(lines)
+
+
 def cpp_generate_system_code(class_def: CppClassDef) -> str:
     lines = [
         f"class {class_def.name}{{",
@@ -43,6 +65,7 @@ def cpp_generate_system_code(class_def: CppClassDef) -> str:
     lines += [
         "};",
         "",
+        _generate_api_usage_comment(class_def),
     ]
     return "\n".join(lines)
 
@@ -250,4 +273,3 @@ def cpp_system_test(
         return 0, {"main_body.cpp": solution_code, "main_trailer.cpp": trailer_code}
     finally:
         shutil.rmtree(TMP_DIR, ignore_errors=True)
-

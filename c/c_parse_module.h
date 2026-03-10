@@ -20,6 +20,7 @@ bool* des_bool_list(char* json_str, size_t* out_size);
 double des_double(char* json_str);
 double* des_double_list(char* json_str, size_t* out_size);
 int* des_tree_list(char* json_str, size_t* out_size);
+char*** des_json_value_list_list(char* json_str, size_t* rows, size_t** cols);
 
 char* ser_int(int value);
 char* ser_long(long long value);
@@ -42,6 +43,7 @@ void delete_string(char* list);
 void delete_int_list_list(int** list, size_t rows);
 void delete_string_list(char** list, size_t size);
 void delete_size_t_list(size_t* list);
+void delete_json_value_list_list(char*** values, size_t rows, size_t* cols);
 
 
 #ifdef __cplusplus

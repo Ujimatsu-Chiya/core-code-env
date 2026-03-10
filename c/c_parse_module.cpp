@@ -112,6 +112,14 @@ int* des_tree_list(char* json_str, size_t* out_size) {
     return result;
 }
 
+char*** des_json_value_list_list(char* json_str, size_t* rows, size_t** cols) {
+    char*** result = des_src_json_value_list_list(json_str, rows, cols);
+    if (!result) {
+        throw std::invalid_argument("Error parsing JSON or invalid json value list list.");
+    }
+    return result;
+}
+
 char* ser_int(int value) {
     // 调用 ser_src_int 进行整数序列化
     char* result = ser_src_int(value);
@@ -355,4 +363,9 @@ void delete_size_t_list(size_t* list) {
     if (list) {
         delete[] list;
     }
+}
+
+void delete_json_value_list_list(char*** values, size_t rows, size_t* cols) {
+    delete_src_json_value_list_list(values, rows, cols);
+    delete[] cols;
 }

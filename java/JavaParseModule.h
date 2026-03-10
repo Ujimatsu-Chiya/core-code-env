@@ -65,6 +65,14 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList
 
 /*
  * Class:     JavaParseModule
+ * Method:    desJsonValueListList
+ * Signature: (Ljava/lang/String;)[[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desJsonValueListList
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     JavaParseModule
  * Method:    desStringList
  * Signature: (Ljava/lang/String;)[Ljava/lang/String;
  */

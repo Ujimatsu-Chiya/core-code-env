@@ -11,6 +11,7 @@ public class JavaParseModule {
     public static native long desLong(String arg);
     public static native String desString(String arg);
     public static native int[][] desIntListList(String arg);
+    public static native String[][] desJsonValueListList(String arg);
     public static native String[] desStringList(String arg);
     public static native double[] desDoubleList(String arg);
     public static native boolean desBool(String arg);

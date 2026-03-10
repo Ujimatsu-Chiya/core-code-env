@@ -219,10 +219,71 @@ JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desIntListList(JNIEnv* env, 
     }
 
     // Clean up allocated memory for the 2D array
+    for (size_t i = 0; i < rows; ++i) {
+        delete[] int_list_list[i];
+    }
     delete[] int_list_list;
     delete[] cols;
 
     return result;
+}
+
+JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desJsonValueListList(JNIEnv* env, jclass clazz, jstring arg) {
+    const char* json_str = env->GetStringUTFChars(arg, nullptr);
+    size_t rows = 0;
+    size_t* cols = nullptr;
+    char*** values = des_src_json_value_list_list(json_str, &rows, &cols);
+    env->ReleaseStringUTFChars(arg, json_str);
+
+    if (!values) {
+        throw_java_exception(env, "java/lang/IllegalArgumentException", "Error parsing JSON or invalid json value list list.");
+        return nullptr;
+    }
+
+    jclass string_class = env->FindClass("java/lang/String");
+    jclass string_array_class = env->FindClass("[Ljava/lang/String;");
+    if (string_class == nullptr || string_array_class == nullptr) {
+        delete_src_json_value_list_list(values, rows, cols);
+        delete[] cols;
+        return nullptr;
+    }
+
+    jobjectArray outer = env->NewObjectArray(rows, string_array_class, nullptr);
+    if (outer == nullptr) {
+        delete_src_json_value_list_list(values, rows, cols);
+        delete[] cols;
+        throw_java_exception(env, "java/lang/OutOfMemoryError", "Failed to allocate memory for outer string array.");
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < rows; ++i) {
+        jobjectArray inner = env->NewObjectArray(cols[i], string_class, nullptr);
+        if (inner == nullptr) {
+            delete_src_json_value_list_list(values, rows, cols);
+            delete[] cols;
+            throw_java_exception(env, "java/lang/OutOfMemoryError", "Failed to allocate memory for inner string array.");
+            return nullptr;
+        }
+
+        for (size_t j = 0; j < cols[i]; ++j) {
+            jstring cell = env->NewStringUTF(values[i][j]);
+            if (cell == nullptr) {
+                env->DeleteLocalRef(inner);
+                delete_src_json_value_list_list(values, rows, cols);
+                delete[] cols;
+                throw_java_exception(env, "java/lang/OutOfMemoryError", "Failed to allocate memory for json value string.");
+                return nullptr;
+            }
+            env->SetObjectArrayElement(inner, j, cell);
+            env->DeleteLocalRef(cell);
+        }
+        env->SetObjectArrayElement(outer, i, inner);
+        env->DeleteLocalRef(inner);
+    }
+
+    delete_src_json_value_list_list(values, rows, cols);
+    delete[] cols;
+    return outer;
 }
 
 JNIEXPORT jobjectArray JNICALL Java_JavaParseModule_desStringList(JNIEnv* env, jclass clazz, jstring arg) {
@@ -687,26 +748,22 @@ JNIEXPORT jstring JNICALL Java_JavaParseModule_serBoolList(JNIEnv* env, jclass c
 
     return result;
 }
-JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList(JNIEnv* env, jclass clazz, jobjectArray value) {
+JNIEXPORT jstring JNICALL Java_JavaParseModule_serTreeList(JNIEnv* env, jclass clazz, jintArray value) {
     if (value == nullptr) {
         // Directly return the string "[]"
         return env->NewStringUTF("[]");
     }
-    // Get the length of the jobjectArray
+    // Get the length of the jintArray
     jsize size = env->GetArrayLength(value);
 
-    // Create a C++ array to hold the values (pointer to arrays of int)
+    // Create a C++ array to hold the values.
     int* values = new int[size];
-
-    for (jsize i = 0; i < size; ++i) {
-        jintArray inner_array = (jintArray)env->GetObjectArrayElement(value, i);
-        jsize inner_size = env->GetArrayLength(inner_array);
-        jint* inner_values = env->GetIntArrayElements(inner_array, nullptr);
-
-        values[i] = inner_values[0]; // Assuming that the first element represents the value to serialize
-
-        env->ReleaseIntArrayElements(inner_array, inner_values, 0);
+    if (values == nullptr) {
+        throw_java_exception(env, "java/lang/OutOfMemoryError", "Failed to allocate memory for tree list.");
+        return nullptr;
     }
+
+    env->GetIntArrayRegion(value, 0, size, values);
 
     // Serialize the tree list using the existing ser_src_tree_list function
     char* result_str = ser_src_tree_list(values, size);
