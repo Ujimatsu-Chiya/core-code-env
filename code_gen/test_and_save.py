@@ -14,12 +14,11 @@ if __package__ in (None, ""):
     if project_root_str not in sys.path:
         sys.path.insert(0, project_root_str)
 
-from code_gen.core.orchestrator import test_solution, test_system, test, main
+from code_gen.core.orchestrator import test_solution, test_system, main
 
 __all__ = [
     "test_solution",
     "test_system",
-    "test",
     "main",
 ]
 

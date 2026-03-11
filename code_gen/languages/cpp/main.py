@@ -49,7 +49,7 @@ if __name__ == "__main__":
     m1 = CppMethodDef("solve", params_type, params_name, return_type)
     print_generated_code("solution", cpp_test(m1))
 
-    # System-design example (compatible with the old commented "System" style).
+    # System-design example.
     ctor = CppMethodDef("ctor", [TypeEnum.INT], ["capacity"], TypeEnum.NONE)
     m2 = CppMethodDef("put", [TypeEnum.INT, TypeEnum.INT], ["key", "value"], TypeEnum.NONE)
     m3 = CppMethodDef("get", [TypeEnum.INT], ["key"], TypeEnum.INT)

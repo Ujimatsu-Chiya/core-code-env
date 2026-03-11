@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from code_gen.utils import TypeEnum, TypeSpec, MethodDef, ClassDef
-from code_gen.runtime_layout import get_runtime_path
+from code_gen.core.runtime_layout import get_runtime_path
 
 JS_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
     TypeEnum.BOOL: TypeSpec("boolean", "false", "desBool", "serBool"),

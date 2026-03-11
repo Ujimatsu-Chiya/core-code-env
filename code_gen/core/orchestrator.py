@@ -22,20 +22,6 @@ def _clean_generated_outputs(result_dir: str) -> None:
                 # Another parallel run may have already removed it.
                 pass
 
-    # Also clean legacy root-level artifacts under ./result.
-    parent_dir = os.path.dirname(result_dir.rstrip("/"))
-    if parent_dir and os.path.basename(parent_dir) == "result" and os.path.isdir(parent_dir):
-        for filename in os.listdir(parent_dir):
-            if not (filename.startswith("main_body.") or filename.startswith("main_trailer.")):
-                continue
-            file_path = os.path.join(parent_dir, filename)
-            if os.path.isfile(file_path):
-                try:
-                    os.remove(file_path)
-                except FileNotFoundError:
-                    # Another parallel run may have already removed it.
-                    pass
-
 
 def _save_payload(result_dir: str, payload: Dict[str, str]) -> None:
     os.makedirs(result_dir, exist_ok=True)
@@ -112,11 +98,6 @@ def test_system(
     return all_results
 
 
-def test(function_name: str, params_type: List[TypeEnum], params_name: List[str], return_type: TypeEnum):
-    # Backward-compatible alias.
-    return test_solution(function_name, params_type, params_name, return_type)
-
-
 def main() -> None:
     params_type = [
         TypeEnum.INT,
@@ -160,6 +141,5 @@ def main() -> None:
 __all__ = [
     "test_solution",
     "test_system",
-    "test",
     "main",
 ]
