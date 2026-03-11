@@ -36,6 +36,7 @@ dist/
 
 # Temporary files
 tmp/
+.tmp/
 result/
 
 # Log files
