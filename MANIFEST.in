@@ -1,0 +1,6 @@
+include rapidjson_helper.cpp
+include rapidjson_helper.h
+recursive-include code_gen/assets *
+recursive-include runtimes *
+recursive-exclude ** __pycache__
+recursive-exclude ** *.py[cod]

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "core-code-env"
+version = "0.1.0"
+description = "Core-code template generator and runtime assets"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.scripts]
+core-code-env-generate = "code_gen.cli.test_and_save:main"
+core-code-env-generate-fast = "code_gen.cli.generate_fast:main_fast"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["code_gen*", "runtimes*"]
+
+[tool.setuptools.package-data]
+code_gen = ["assets/*"]
+runtimes = ["**/*"]
+
+[tool.setuptools.exclude-package-data]
+code_gen = ["**/__pycache__/*", "**/*.pyc", "**/*.pyo"]
+runtimes = ["**/__pycache__/*", "**/*.pyc", "**/*.pyo"]

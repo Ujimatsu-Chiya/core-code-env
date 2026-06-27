@@ -1,4 +1,4 @@
-"""Orchestration entrypoint."""
+"""Fast generation entrypoint without compile/run validation."""
 
 from pathlib import Path
 import sys
@@ -14,16 +14,14 @@ if __package__ in (None, ""):
     if project_root_str not in sys.path:
         sys.path.insert(0, project_root_str)
 
-from code_gen.core.orchestrator import generate_solution, generate_system, test_solution, test_system, main
+from code_gen.core.orchestrator import generate_solution, generate_system, main_fast
 
 __all__ = [
-    "test_solution",
     "generate_solution",
-    "test_system",
     "generate_system",
-    "main",
+    "main_fast",
 ]
 
 
 if __name__ == "__main__":
-    main()
+    main_fast()

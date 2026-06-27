@@ -55,6 +55,30 @@ def test_solution(
     return all_results
 
 
+def generate_solution(
+    function_name: str,
+    params_type: List[TypeEnum],
+    params_name: List[str],
+    return_type: TypeEnum,
+    result_dir: str = "result/solution",
+):
+    """Generate templates without compiling or running them."""
+    assert len(params_name) == len(params_type)
+    _clean_generated_outputs(result_dir)
+    all_results = {}
+    for lang, op in SOLUTION_LANGUAGE_OPS.items():
+        styled_fn = op.function_name_style(function_name)
+        styled_params = list(map(op.params_name_style, params_name))
+        method_def = op.method_cls(styled_fn, params_type, styled_params, return_type)
+        payload = {
+            f"main_body.{op.extension}": op.solution_fn(method_def),
+            f"main_trailer.{op.extension}": op.trailer_fn(method_def),
+        }
+        _save_payload(result_dir, payload)
+        all_results[lang] = (0, sorted(payload.keys()))
+    return all_results
+
+
 def test_system(
     class_name: str,
     constructor_params_type: List[TypeEnum],
@@ -93,6 +117,48 @@ def test_system(
             all_results[lang] = result
             continue
         payload = result[1]
+        _save_payload(result_dir, payload)
+        all_results[lang] = (0, sorted(payload.keys()))
+    return all_results
+
+
+def generate_system(
+    class_name: str,
+    constructor_params_type: List[TypeEnum],
+    constructor_params_name: List[str],
+    methods: List[MethodDef],
+    result_dir: str = "result/system",
+):
+    """Generate system-design templates without compiling or running them."""
+    assert len(constructor_params_name) == len(constructor_params_type)
+    _clean_generated_outputs(result_dir)
+    for method in methods:
+        assert len(method.params_name) == len(method.params_type)
+
+    all_results = {}
+    for lang, op in SYSTEM_LANGUAGE_OPS.items():
+        styled_class_name = op.class_name_style(class_name)
+        ctor = op.method_cls(
+            "ctor",
+            constructor_params_type,
+            list(map(op.params_name_style, constructor_params_name)),
+            TypeEnum.NONE,
+        )
+        styled_methods = []
+        for method in methods:
+            styled_methods.append(
+                op.method_cls(
+                    op.method_name_style(method.function_name),
+                    method.params_type,
+                    list(map(op.params_name_style, method.params_name)),
+                    method.return_type,
+                )
+            )
+        class_def = op.class_cls(styled_class_name, ctor, styled_methods)
+        payload = {
+            f"main_body.{op.extension}": op.solution_fn(class_def),
+            f"main_trailer.{op.extension}": op.trailer_fn(class_def),
+        }
         _save_payload(result_dir, payload)
         all_results[lang] = (0, sorted(payload.keys()))
     return all_results
@@ -138,8 +204,51 @@ def main() -> None:
     print(test_system("MinStack", [TypeEnum.INT], ["capacity"], methods))
 
 
+def main_fast() -> None:
+    params_type = [
+        TypeEnum.INT,
+        TypeEnum.LONG,
+        TypeEnum.DOUBLE,
+        TypeEnum.STRING,
+        TypeEnum.INT_LIST,
+        TypeEnum.INT_LIST_LIST,
+        TypeEnum.DOUBLE_LIST,
+        TypeEnum.STRING_LIST,
+        TypeEnum.BOOL_LIST,
+        TypeEnum.BOOL,
+        TypeEnum.TREENODE,
+        TypeEnum.LISTNODE,
+    ]
+    params_name = [
+        "appleTreeInTheMorning",
+        "bigMountainWithSnow",
+        "coolBreezeOnTheBeach",
+        "dancingStarsUnderTheMoonlight",
+        "elegantFlowerInTheGarden",
+        "funnyDogChasingItsTail",
+        "greenAppleFreshFromTheTree",
+        "happyBirdSingingInTheTree",
+        "interestingBookWithManyStories",
+        "joyfulSunriseOnTheHorizon",
+        "kindHeartHelpingOthers",
+        "laughingChildInThePark",
+    ]
+    print(generate_solution("solve", params_type, params_name, TypeEnum.INT_LIST_LIST))
+
+    methods = [
+        MethodDef("push", [TypeEnum.INT], ["x"], TypeEnum.NONE),
+        MethodDef("pop", [], [], TypeEnum.NONE),
+        MethodDef("top", [], [], TypeEnum.INT),
+        MethodDef("getMin", [], [], TypeEnum.INT),
+    ]
+    print(generate_system("MinStack", [TypeEnum.INT], ["capacity"], methods))
+
+
 __all__ = [
     "test_solution",
+    "generate_solution",
     "test_system",
+    "generate_system",
     "main",
+    "main_fast",
 ]

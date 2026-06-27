@@ -10,7 +10,10 @@ fi
 
 echo "[info] Installing base build tools..."
 sudo apt update
-sudo apt install -y build-essential git curl
+sudo apt install -y git curl
+
+echo "[info] Setting up C/C++..."
+bash "${script_dir}/setup_gpp.sh"
 
 echo "[info] Setting up Python..."
 bash "${script_dir}/setup_python.sh"
@@ -20,6 +23,7 @@ bash "${script_dir}/setup_java.sh"
 
 echo "[info] Setting up Go + goimports..."
 bash "${script_dir}/setup_go.sh"
+export PATH="/usr/local/go/bin:${HOME}/go/bin:${PATH}"
 bash "${script_dir}/setup_goimports.sh"
 
 echo "[info] Setting up Node.js + TypeScript..."

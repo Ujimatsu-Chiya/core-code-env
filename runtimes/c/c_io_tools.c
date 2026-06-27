@@ -1,4 +1,5 @@
 # include "c_io_tools.h"
+# include <ctype.h>
 
 const char* READ_PATH = "user.in";
 const char* WRITE_PATH = "user.out";

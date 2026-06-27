@@ -9,8 +9,11 @@ export class StdinWrapper {
     private currentLineIndex: number;
 
     constructor() {
+        if (!fs.existsSync(READ_PATH)) {
+            fs.closeSync(fs.openSync(READ_PATH, 'a'));
+        }
         const fileContent = fs.readFileSync(READ_PATH, 'utf-8');
-        this.lines = fileContent.split('\n').map(line => line.trim());
+        this.lines = fileContent.split('\n').map((line: string) => line.trim());
         const emptyIndex = this.lines.findIndex(line => line === '');
         if (emptyIndex !== -1) {
             this.lines = this.lines.slice(0, emptyIndex);
@@ -36,4 +39,3 @@ export class StdoutWrapper {
         this.stdout.write(s + '\n');
     }
 }
-

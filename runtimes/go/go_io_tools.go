@@ -19,8 +19,17 @@ type StdinWrapper struct {
 func CreateStdinWrapper() *StdinWrapper {
 	file, err := os.Open(READ_PATH)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening input file: %v\n", err)
-		os.Exit(1)
+		if os.IsNotExist(err) {
+			file, err = os.Create(READ_PATH)
+			if err == nil {
+				file.Close()
+				file, err = os.Open(READ_PATH)
+			}
+		}
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error opening input file: %v\n", err)
+			os.Exit(1)
+		}
 	}
 	return &StdinWrapper{
 		scanner: bufio.NewScanner(file),

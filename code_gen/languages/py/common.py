@@ -7,7 +7,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from code_gen.utils import TypeEnum, TypeSpec, MethodDef, ClassDef
-from code_gen.core.runtime_layout import get_runtime_path
+from code_gen.core.runtime_layout import (
+    get_runtime_path,
+    get_rapidjson_helper_cpp,
+    get_rapidjson_helper_include_dir,
+)
 
 PY_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
     TypeEnum.BOOL: TypeSpec("bool", "False", "des_bool", "ser_bool"),
@@ -61,9 +65,17 @@ def _build_py_runtime_module(path: str = PY_RUNTIME_PATH) -> Tuple[int, str]:
     if so_files:
         return 0, ""
 
+    env = os.environ.copy()
+    env.setdefault("CODE_GEN_RAPIDJSON_HELPER_CPP", get_rapidjson_helper_cpp())
+    env.setdefault(
+        "CODE_GEN_RAPIDJSON_HELPER_INCLUDE_DIR",
+        get_rapidjson_helper_include_dir(),
+    )
+
     result = subprocess.run(
         ["python3", "setup.py", "build", "--build-lib", "."],
         cwd=path,
+        env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,

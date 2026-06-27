@@ -1,6 +1,7 @@
 """Shared definitions/utilities for C code generation."""
 
 import os
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -14,7 +15,11 @@ from code_gen.utils import (
     to_camel_case,
     to_pascal_case,
 )
-from code_gen.core.runtime_layout import get_runtime_path, get_rapidjson_helper_cpp
+from code_gen.core.runtime_layout import (
+    get_runtime_path,
+    get_rapidjson_helper_cpp,
+    get_rapidjson_helper_include_dir,
+)
 
 C_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
     TypeEnum.BOOL: TypeSpec("bool", "false", "des_bool", "ser_bool"),
@@ -56,6 +61,22 @@ C_RUNTIME_FILES = [
     "c_parse_module.h",
     "libc_parse_tools.so",
 ]
+
+
+def _pkg_config_args(package: str, *options: str) -> Tuple[int, str, List[str]]:
+    try:
+        result = subprocess.run(
+            ["pkg-config", *options, package],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except FileNotFoundError:
+        return 1, "pkg-config is not found in PATH. Install pkg-config and libglib2.0-dev.", []
+    if result.returncode != 0:
+        message = result.stderr.strip() or result.stdout.strip()
+        return result.returncode, message, []
+    return 0, "", shlex.split(result.stdout.strip())
 
 
 def _c_param_decl(p_type: TypeEnum, p_name: str) -> List[str]:
@@ -199,6 +220,7 @@ def _build_c_runtime_lib(path: str = C_RUNTIME_PATH) -> Tuple[int, str]:
             "c_parse_tools.c",
             "c_parse_module.cpp",
             get_rapidjson_helper_cpp(),
+            f"-I{get_rapidjson_helper_include_dir()}",
         ],
         cwd=path,
         stdout=subprocess.PIPE,
@@ -243,8 +265,26 @@ def prepare_c_workspace(solution_code: str, trailer_code: str, input_lines: List
 
 
 def compile_c_workspace(tmp_dir: str = TMP_DIR) -> Tuple[int, str]:
+    ret, message, glib_cflags = _pkg_config_args("glib-2.0", "--cflags")
+    if ret != 0:
+        return ret, message
+    ret, message, glib_libs = _pkg_config_args("glib-2.0", "--libs")
+    if ret != 0:
+        return ret, message
+
     result = subprocess.run(
-        ["gcc", "-o", "main", "main.c", "c_io_tools.c", "-L.", "-lc_parse_tools", "-Wl,-rpath=."],
+        [
+            "gcc",
+            "-o",
+            "main",
+            *glib_cflags,
+            "main.c",
+            "c_io_tools.c",
+            "-L.",
+            "-lc_parse_tools",
+            "-Wl,-rpath=.",
+            *glib_libs,
+        ],
         cwd=tmp_dir,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

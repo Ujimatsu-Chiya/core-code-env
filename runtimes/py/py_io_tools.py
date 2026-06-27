@@ -5,6 +5,7 @@ WRITE_PATH = 'user.out'
 
 class StdinWrapper:
     def __init__(self):
+        open(READ_PATH, 'a').close()
         self.stdin = open(READ_PATH,'r')
 
     def read_line(self):

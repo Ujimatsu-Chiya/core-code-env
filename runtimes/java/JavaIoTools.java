@@ -5,6 +5,7 @@ class StdinWrapper {
     private BufferedReader reader;
     private static String filePath = "user.in";
     public StdinWrapper() throws IOException {
+        new File(filePath).createNewFile();
         reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
     }
 

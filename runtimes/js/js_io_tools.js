@@ -6,6 +6,9 @@ const READ_PATH = 'user.in';
 const WRITE_PATH = 'user.out';
 class StdinWrapper {
     constructor() {
+        if (!fs.existsSync(READ_PATH)) {
+            fs.closeSync(fs.openSync(READ_PATH, 'a'));
+        }
         const fileContent = fs.readFileSync(READ_PATH, 'utf-8');
         this.lines = fileContent.split('\n').map(line => line.trim());
         const emptyIndex = this.lines.findIndex(line => line === '');

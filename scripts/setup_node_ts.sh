@@ -17,6 +17,13 @@ else
   sudo npm install -g typescript
 fi
 
+echo "[info] Installing Node.js TypeScript definitions..."
+if npm root -g >/dev/null 2>&1 && [ -d "$(npm root -g)/@types/node" ]; then
+  echo "[info] @types/node already exists: $(npm root -g)/@types/node"
+else
+  sudo npm install -g @types/node
+fi
+
 echo "[info] Node/TypeScript installation check"
 node --version
 npm --version

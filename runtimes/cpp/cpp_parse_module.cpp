@@ -1,7 +1,7 @@
 // C++ wrappers that convert raw C allocations into std::string/std::vector APIs.
 #include <vector>
 #include <stdexcept>
-#include "../rapidjson_helper.h"
+#include "rapidjson_helper.h"
 #include "cpp_parse_module.h"
 
 // Take ownership of C heap string and convert to std::string.
@@ -362,6 +362,5 @@ std::string ser_tree_list(const std::vector<int> &values)
     delete[] tree_array; // Clean up memory
     return from_owned_cstr(raw);
 }
-
 
 

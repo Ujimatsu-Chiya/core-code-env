@@ -7,7 +7,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from code_gen.utils import TypeEnum, TypeSpec, MethodDef, ClassDef
-from code_gen.core.runtime_layout import get_runtime_path, get_rapidjson_helper_cpp
+from code_gen.core.runtime_layout import (
+    get_runtime_path,
+    get_rapidjson_helper_cpp,
+    get_rapidjson_helper_include_dir,
+)
 
 JAVA_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
     TypeEnum.BOOL: TypeSpec("boolean", "false", "desBool", "serBool"),
@@ -69,7 +73,7 @@ def _build_java_runtime_lib(path: str = JAVA_RUNTIME_PATH) -> Tuple[int, str]:
 
     java_home = os.environ.get("JAVA_HOME")
     if not java_home:
-        return 1, "JAVA_HOME is not set. Run `script/setup_java.sh` or export JAVA_HOME first."
+        return 1, "JAVA_HOME is not set. Run `scripts/setup_java.sh` or export JAVA_HOME first."
 
     result = subprocess.run(
         [
@@ -80,6 +84,7 @@ def _build_java_runtime_lib(path: str = JAVA_RUNTIME_PATH) -> Tuple[int, str]:
             "libjava_parse_module.so",
             "java_parse_module.cpp",
             get_rapidjson_helper_cpp(),
+            f"-I{get_rapidjson_helper_include_dir()}",
             f"-I{java_home}/include",
             f"-I{java_home}/include/linux",
         ],

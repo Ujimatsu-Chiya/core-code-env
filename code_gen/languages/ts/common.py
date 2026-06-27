@@ -35,6 +35,24 @@ TS_RUNTIME_FILES = [
     "ts_type_node.ts",
 ]
 
+TS_NODE_SHIM = """declare module 'fs' {
+    export type WriteStream = any;
+    export const existsSync: any;
+    export const closeSync: any;
+    export const openSync: any;
+    export const readFileSync: any;
+    export const writeFileSync: any;
+    export const createWriteStream: any;
+}
+
+declare const process: {
+    hrtime: {
+        bigint(): bigint;
+    };
+    exit(code?: number): never;
+};
+"""
+
 
 @dataclass
 class TsMethodDef(MethodDef):
@@ -78,18 +96,24 @@ def _copy_runtime_files(path: str = TS_RUNTIME_PATH, tmp_dir: str = TMP_DIR) -> 
         shutil.copy(src, dst)
 
 
+def _write_node_shim(tmp_dir: str = TMP_DIR) -> None:
+    with open(os.path.join(tmp_dir, "node_shim.d.ts"), "w") as fp:
+        fp.write(TS_NODE_SHIM)
+
+
 def prepare_ts_workspace(solution_code: str, trailer_code: str, input_lines: List[str], tmp_dir: str = TMP_DIR) -> Tuple[int, str]:
     os.makedirs(tmp_dir, exist_ok=True)
     _write_user_input(input_lines, tmp_dir)
     _write_main_ts(solution_code, trailer_code, tmp_dir=tmp_dir)
     _copy_runtime_files(tmp_dir=tmp_dir)
+    _write_node_shim(tmp_dir=tmp_dir)
     return 0, ""
 
 
 def compile_ts_workspace(tmp_dir: str = TMP_DIR) -> Tuple[int, str]:
     try:
         result = subprocess.run(
-            ["tsc", "--target", "es6", "--module", "commonjs", "main.ts"],
+            ["tsc", "--target", "es6", "--module", "commonjs", "node_shim.d.ts", "main.ts"],
             cwd=tmp_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

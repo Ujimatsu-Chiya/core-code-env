@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+bashrc="${HOME}/.bashrc"
+
+if [ -d "/usr/local/go/bin" ] && [[ ":${PATH}:" != *":/usr/local/go/bin:"* ]]; then
+  export PATH="/usr/local/go/bin:${PATH}"
+fi
+
+if [ -d "${HOME}/go/bin" ] && [[ ":${PATH}:" != *":${HOME}/go/bin:"* ]]; then
+  export PATH="${PATH}:${HOME}/go/bin"
+fi
+
 if ! command -v go >/dev/null 2>&1; then
   echo "[error] go is not installed. Install Go first, e.g.:"
   echo "        sudo apt update && sudo apt install -y golang-go"
@@ -28,9 +38,10 @@ if [ ! -x "${goimports_path}" ]; then
 fi
 
 if [[ ":${PATH}:" != *":${go_bin}:"* ]]; then
+  export PATH="${PATH}:${go_bin}"
   echo "[info] Adding ${go_bin} to ~/.bashrc"
-  if ! grep -q "export PATH=.*${go_bin}" ~/.bashrc; then
-    echo "export PATH=\$PATH:${go_bin}" >> ~/.bashrc
+  if [ ! -f "${bashrc}" ] || ! grep -q "export PATH=.*${go_bin}" "${bashrc}"; then
+    echo "export PATH=\$PATH:${go_bin}" >> "${bashrc}"
   fi
 fi
 

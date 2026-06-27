@@ -7,7 +7,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from code_gen.utils import TypeEnum, TypeSpec, MethodDef, ClassDef
-from code_gen.core.runtime_layout import get_runtime_path, get_rapidjson_helper_cpp
+from code_gen.core.runtime_layout import (
+    get_runtime_path,
+    get_rapidjson_helper_cpp,
+    get_rapidjson_helper_include_dir,
+)
 
 CPP_TYPE_SPECS: Dict[TypeEnum, TypeSpec] = {
     TypeEnum.BOOL: TypeSpec("bool", "false", "des_bool", "ser_bool"),
@@ -89,6 +93,7 @@ def _build_cpp_runtime_lib(path: str = CPP_RUNTIME_PATH) -> Tuple[int, str]:
             "cpp_parse_tools.cpp",
             "cpp_parse_module.cpp",
             get_rapidjson_helper_cpp(),
+            f"-I{get_rapidjson_helper_include_dir()}",
         ],
         cwd=path,
         stdout=subprocess.PIPE,

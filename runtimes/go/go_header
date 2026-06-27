@@ -1,7 +1,16 @@
 package main
 
-import(
-    
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"runtime"
+)
+
+var (
+	_ = json.RawMessage{}
+	_ = fmt.Fprintf
+	_ = os.Stderr
 )
 
 func GetCPUTime() int64 {
@@ -11,4 +20,3 @@ func GetCPUTime() int64 {
 }
 
 // The user's code will be inserted below here.
-

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+from importlib import resources
 from typing import List
 
 
@@ -24,6 +25,17 @@ def _candidate_runtime_dirs(lang: str) -> List[Path]:
     if runtime_root:
         candidates.append(Path(runtime_root) / lang)
 
+    core_root = os.getenv("CODE_GEN_CORE_ROOT")
+    if core_root:
+        candidates.append(Path(core_root) / "runtimes" / lang)
+
+    try:
+        packaged_runtime = resources.files("runtimes").joinpath(lang)
+        if packaged_runtime.is_dir():
+            candidates.append(Path(str(packaged_runtime)))
+    except (ModuleNotFoundError, FileNotFoundError):
+        pass
+
     candidates.append(REPO_ROOT / "runtimes" / lang)
     return candidates
 
@@ -37,12 +49,66 @@ def get_runtime_path(lang: str) -> str:
     candidates = ", ".join(str(p) for p in _candidate_runtime_dirs(lang))
     raise FileNotFoundError(
         f"Runtime directory for `{lang}` not found. Checked: {candidates}. "
-        "You can set CODE_GEN_RUNTIME_ROOT or CODE_GEN_RUNTIME_<LANG>_PATH."
+        "You can set CODE_GEN_RUNTIME_ROOT, CODE_GEN_CORE_ROOT, "
+        "or CODE_GEN_RUNTIME_<LANG>_PATH."
     )
 
 
+def _candidate_core_roots() -> List[Path]:
+    candidates: List[Path] = []
+
+    core_root = os.getenv("CODE_GEN_CORE_ROOT")
+    if core_root:
+        candidates.append(Path(core_root))
+
+    runtime_root = os.getenv("CODE_GEN_RUNTIME_ROOT")
+    if runtime_root:
+        rr = Path(runtime_root)
+        candidates.append(rr.parent if rr.name == "runtimes" else rr)
+
+    try:
+        asset_root = resources.files("code_gen.assets")
+        if asset_root.is_dir():
+            candidates.append(Path(str(asset_root)))
+    except (ModuleNotFoundError, FileNotFoundError):
+        pass
+
+    candidates.append(REPO_ROOT)
+    return candidates
+
+
 def get_rapidjson_helper_cpp() -> str:
-    return str(REPO_ROOT / "rapidjson_helper.cpp")
+    explicit = os.getenv("CODE_GEN_RAPIDJSON_HELPER_CPP")
+    if explicit:
+        p = Path(explicit)
+        if p.is_file():
+            return str(p)
+
+    for root in _candidate_core_roots():
+        candidate = root / "rapidjson_helper.cpp"
+        if candidate.is_file():
+            return str(candidate)
+
+    candidates = ", ".join(str(root / "rapidjson_helper.cpp") for root in _candidate_core_roots())
+    raise FileNotFoundError(
+        f"rapidjson_helper.cpp not found. Checked: {candidates}. "
+        "You can set CODE_GEN_CORE_ROOT or CODE_GEN_RAPIDJSON_HELPER_CPP."
+    )
 
 
-__all__ = ["get_runtime_path", "get_rapidjson_helper_cpp"]
+def get_rapidjson_helper_include_dir() -> str:
+    explicit = os.getenv("CODE_GEN_RAPIDJSON_HELPER_INCLUDE_DIR")
+    if explicit:
+        p = Path(explicit)
+        if p.is_dir():
+            return str(p)
+
+    helper = Path(get_rapidjson_helper_cpp())
+    return str(helper.parent)
+
+
+__all__ = [
+    "get_runtime_path",
+    "get_rapidjson_helper_cpp",
+    "get_rapidjson_helper_include_dir",
+]
