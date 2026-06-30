@@ -6,8 +6,6 @@ from importlib import resources
 from typing import List
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-
 SUPPORTED_LANGS = {"c", "cpp", "java", "py", "ts", "js", "go"}
 
 
@@ -36,7 +34,6 @@ def _candidate_runtime_dirs(lang: str) -> List[Path]:
     except (ModuleNotFoundError, FileNotFoundError):
         pass
 
-    candidates.append(REPO_ROOT / "runtimes" / lang)
     return candidates
 
 
@@ -73,7 +70,6 @@ def _candidate_core_roots() -> List[Path]:
     except (ModuleNotFoundError, FileNotFoundError):
         pass
 
-    candidates.append(REPO_ROOT)
     return candidates
 
 

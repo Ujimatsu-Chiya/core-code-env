@@ -31,13 +31,12 @@
 │   ├── core/                  # 编排、类型、路径解析、临时工作区
 │   ├── languages/<lang>/      # 各语言生成器
 │   ├── cli/                   # CLI 入口
+│   ├── assets/                # 打包进 Python 包的公共 C++ helper
 │   └── test_and_save.py       # 本地入口
 ├── runtimes/<lang>/           # 公共 runtime、parser、IO helper
 ├── scripts/                   # 安装与部署辅助脚本
 ├── nix/                       # core-code-env runtime 的 Nix derivation
 ├── result/                    # 示例生成结果
-├── rapidjson_helper.cpp       # C/C++/Java/Python parser 共用实现
-├── rapidjson_helper.h
 └── gen.sh                     # 生成示例模板
 ```
 
@@ -269,7 +268,9 @@ export CODE_GEN_CORE_ROOT=/abs/path/to/core-code-env-runtime
 export CODE_GEN_RUNTIME_CPP_PATH=/abs/path/to/custom/cpp_runtime
 ```
 
-`rapidjson_helper.cpp` 也可以覆盖：
+C/C++/Java/Python parser 共用的 `rapidjson_helper.cpp` 和 `rapidjson_helper.h`
+以 `code_gen/assets/` 作为源码中的唯一副本。默认会从 Python 包资源或安装后的
+`CODE_GEN_CORE_ROOT` 中解析，也可以手动覆盖：
 
 ```bash
 export CODE_GEN_RAPIDJSON_HELPER_CPP=/abs/path/to/rapidjson_helper.cpp

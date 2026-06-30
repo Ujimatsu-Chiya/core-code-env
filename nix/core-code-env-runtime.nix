@@ -33,20 +33,20 @@ pkgs.stdenv.mkDerivation {
       runtimes/c/c_io_tools.c \
       runtimes/c/c_parse_tools.c \
       runtimes/c/c_parse_module.cpp \
-      rapidjson_helper.cpp \
-      -I. -Iruntimes/c -isystem ${pkgs.rapidjson}/include
+      code_gen/assets/rapidjson_helper.cpp \
+      -Icode_gen/assets -Iruntimes/c -isystem ${pkgs.rapidjson}/include
 
     g++ -shared -fPIC \
       -o libcpp_parse_tools.so \
       runtimes/cpp/cpp_parse_tools.cpp \
       runtimes/cpp/cpp_parse_module.cpp \
-      rapidjson_helper.cpp \
-      -I. -Iruntimes/cpp -isystem ${pkgs.rapidjson}/include
+      code_gen/assets/rapidjson_helper.cpp \
+      -Icode_gen/assets -Iruntimes/cpp -isystem ${pkgs.rapidjson}/include
 
     (
       cd runtimes/py
-      CODE_GEN_RAPIDJSON_HELPER_CPP="$PWD/../../rapidjson_helper.cpp" \
-      CODE_GEN_RAPIDJSON_HELPER_INCLUDE_DIR="$PWD/../.." \
+      CODE_GEN_RAPIDJSON_HELPER_CPP="$PWD/../../code_gen/assets/rapidjson_helper.cpp" \
+      CODE_GEN_RAPIDJSON_HELPER_INCLUDE_DIR="$PWD/../../code_gen/assets" \
       CPLUS_INCLUDE_PATH="${pkgs.rapidjson}/include''${CPLUS_INCLUDE_PATH:+:$CPLUS_INCLUDE_PATH}" \
       python3 setup.py build --build-lib .
     )
@@ -54,8 +54,8 @@ pkgs.stdenv.mkDerivation {
     g++ -shared -fPIC \
       -o libjava_parse_module.so \
       runtimes/java/java_parse_module.cpp \
-      rapidjson_helper.cpp \
-      -I. -Iruntimes/java \
+      code_gen/assets/rapidjson_helper.cpp \
+      -Icode_gen/assets -Iruntimes/java \
       -I${pkgs.openjdk_headless}/include \
       -I${pkgs.openjdk_headless}/include/linux \
       -isystem ${pkgs.rapidjson}/include
@@ -73,13 +73,13 @@ pkgs.stdenv.mkDerivation {
       $out/lib
 
     cp -r runtimes/. $out/share/core-code-env/runtimes/
-    cp rapidjson_helper.cpp rapidjson_helper.h $out/share/core-code-env/
+    cp code_gen/assets/rapidjson_helper.cpp code_gen/assets/rapidjson_helper.h $out/share/core-code-env/
     cp scripts/core_code_compile.sh $out/share/core-code-env/core_code_compile.sh
     chmod +x $out/share/core-code-env/core_code_compile.sh
 
     cp runtimes/c/*.h $out/include/core-code-env/c/
     cp runtimes/cpp/*.h $out/include/core-code-env/cpp/
-    cp rapidjson_helper.h $out/include/core-code-env/rapidjson_helper.h
+    cp code_gen/assets/rapidjson_helper.h $out/include/core-code-env/rapidjson_helper.h
 
     cp libc_parse_tools.so $out/lib/
     cp libcpp_parse_tools.so $out/lib/

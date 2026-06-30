@@ -9,9 +9,10 @@ python_lib_dir = sysconfig.get_paths()["stdlib"]
 
 runtime_dir = os.path.dirname(os.path.abspath(__file__))
 repo_root = os.path.abspath(os.path.join(runtime_dir, "..", ".."))
+
 helper_cpp = os.environ.get(
     "CODE_GEN_RAPIDJSON_HELPER_CPP",
-    os.path.join(repo_root, "rapidjson_helper.cpp"),
+    os.path.join(repo_root, "code_gen", "assets", "rapidjson_helper.cpp"),
 )
 helper_include_dir = os.environ.get(
     "CODE_GEN_RAPIDJSON_HELPER_INCLUDE_DIR",
@@ -41,4 +42,3 @@ setup(
     description="A Python module for parsing JSON arrays using RapidJSON.",
     ext_modules=[module],
 )
-

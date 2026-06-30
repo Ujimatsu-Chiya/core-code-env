@@ -3,6 +3,7 @@ set -euo pipefail
 
 PREFIX="${1:-/usr/local}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HELPER_ROOT="$REPO_ROOT/code_gen/assets"
 
 CXX="${CXX:-g++}"
 RAPIDJSON_CFLAGS="${RAPIDJSON_CFLAGS:-}"
@@ -30,8 +31,8 @@ mkdir -p \
   "$PREFIX/lib"
 
 cp -a "$REPO_ROOT/runtimes/." "$PREFIX/share/core-code-env/runtimes/"
-cp "$REPO_ROOT/rapidjson_helper.cpp" "$PREFIX/share/core-code-env/rapidjson_helper.cpp"
-cp "$REPO_ROOT/rapidjson_helper.h" "$PREFIX/share/core-code-env/rapidjson_helper.h"
+cp "$HELPER_ROOT/rapidjson_helper.cpp" "$PREFIX/share/core-code-env/rapidjson_helper.cpp"
+cp "$HELPER_ROOT/rapidjson_helper.h" "$PREFIX/share/core-code-env/rapidjson_helper.h"
 
 mkdir -p \
   "$PREFIX/include/core-code-env/c" \
@@ -43,21 +44,21 @@ cp "$REPO_ROOT/runtimes/c/"*.h "$PREFIX/include/core-code-env/c/"
 cp "$REPO_ROOT/runtimes/cpp/"*.h "$PREFIX/include/core-code-env/cpp/"
 copy_optional_headers "$REPO_ROOT/runtimes/java" "$PREFIX/include/core-code-env/java"
 copy_optional_headers "$REPO_ROOT/runtimes/py" "$PREFIX/include/core-code-env/py"
-cp "$REPO_ROOT/rapidjson_helper.h" "$PREFIX/include/core-code-env/rapidjson_helper.h"
+cp "$HELPER_ROOT/rapidjson_helper.h" "$PREFIX/include/core-code-env/rapidjson_helper.h"
 
 "$CXX" -shared -fPIC \
   -o "$PREFIX/lib/libc_parse_tools.so" \
   "$REPO_ROOT/runtimes/c/c_parse_tools.c" \
   "$REPO_ROOT/runtimes/c/c_parse_module.cpp" \
-  "$REPO_ROOT/rapidjson_helper.cpp" \
-  -I"$REPO_ROOT" -I"$REPO_ROOT/runtimes/c" $RAPIDJSON_CFLAGS
+  "$HELPER_ROOT/rapidjson_helper.cpp" \
+  -I"$HELPER_ROOT" -I"$REPO_ROOT/runtimes/c" $RAPIDJSON_CFLAGS
 
 "$CXX" -shared -fPIC \
   -o "$PREFIX/lib/libcpp_parse_tools.so" \
   "$REPO_ROOT/runtimes/cpp/cpp_parse_tools.cpp" \
   "$REPO_ROOT/runtimes/cpp/cpp_parse_module.cpp" \
-  "$REPO_ROOT/rapidjson_helper.cpp" \
-  -I"$REPO_ROOT" -I"$REPO_ROOT/runtimes/cpp" $RAPIDJSON_CFLAGS
+  "$HELPER_ROOT/rapidjson_helper.cpp" \
+  -I"$HELPER_ROOT" -I"$REPO_ROOT/runtimes/cpp" $RAPIDJSON_CFLAGS
 
 cp "$PREFIX/lib/libc_parse_tools.so" "$PREFIX/share/core-code-env/runtimes/c/libc_parse_tools.so"
 cp "$PREFIX/lib/libcpp_parse_tools.so" "$PREFIX/share/core-code-env/runtimes/cpp/libcpp_parse_tools.so"
