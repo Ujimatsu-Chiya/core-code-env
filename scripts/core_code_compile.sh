@@ -14,6 +14,31 @@ require_file() {
   [ -f "$1" ] || die "missing file: $1"
 }
 
+add_pkg_config_dir() {
+  local dir="$1"
+  [ -d "$dir" ] || return 0
+  case ":${PKG_CONFIG_PATH:-}:" in
+    *":$dir:"*) ;;
+    *) PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$dir" ;;
+  esac
+}
+
+setup_pkg_config_path() {
+  local dir
+  for dir in \
+    "$lib_dir/pkgconfig" \
+    "$lib_dir"/*/pkgconfig \
+    /lib/pkgconfig \
+    /lib/*/pkgconfig \
+    /usr/lib/pkgconfig \
+    /usr/lib/*/pkgconfig \
+    /usr/share/pkgconfig \
+    /share/pkgconfig; do
+    add_pkg_config_dir "$dir"
+  done
+  export PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}"
+}
+
 patch_cpp_user_input_guard() {
   local inserted=0
   local line
@@ -84,6 +109,7 @@ compile_c() {
   require_file "foo.c"
   require_file "main_trailer.c"
   command -v pkg-config >/dev/null 2>&1 || die "pkg-config is required for C submissions"
+  setup_pkg_config_path
   pkg-config --exists glib-2.0 || die "glib-2.0 development files are required for C submissions"
 
   cat "$runtime_root/c/c_header" foo.c main_trailer.c > main.c
