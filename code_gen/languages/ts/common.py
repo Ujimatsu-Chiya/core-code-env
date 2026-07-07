@@ -111,9 +111,21 @@ def prepare_ts_workspace(solution_code: str, trailer_code: str, input_lines: Lis
 
 
 def compile_ts_workspace(tmp_dir: str = TMP_DIR) -> Tuple[int, str]:
+    empty_type_roots = os.path.join(tmp_dir, ".core_code_empty_types")
+    os.makedirs(empty_type_roots, exist_ok=True)
     try:
         result = subprocess.run(
-            ["tsc", "--target", "es6", "--module", "commonjs", "node_shim.d.ts", "main.ts"],
+            [
+                "tsc",
+                "--target",
+                "es6",
+                "--module",
+                "commonjs",
+                "--typeRoots",
+                empty_type_roots,
+                "node_shim.d.ts",
+                "main.ts",
+            ],
             cwd=tmp_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

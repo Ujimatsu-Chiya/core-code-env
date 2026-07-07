@@ -1,6 +1,7 @@
 """TypeScript generator logic for classic function-style problems."""
 
 from code_gen.utils import TypeEnum, json_default_val
+from code_gen.core.node_comments import method_node_types, prepend_node_definition_comments
 from code_gen.core.workspace import create_tmp_workspace, cleanup_tmp_workspace
 from .common import (
     TS_TYPE_SPECS,
@@ -57,7 +58,7 @@ def ts_generate_solution_code(method_def: TsMethodDef) -> str:
         "    }",
         "}",
     ]
-    return "\n".join(lines)
+    return prepend_node_definition_comments("\n".join(lines), "ts", method_node_types(method_def))
 
 
 def ts_generate_trailer_code(method_def: TsMethodDef) -> str:

@@ -1,6 +1,7 @@
 """C generator logic for classic function-style problems."""
 
 from code_gen.utils import TypeEnum, json_default_val
+from code_gen.core.node_comments import method_node_types, prepend_node_definition_comments
 from code_gen.core.workspace import create_tmp_workspace, cleanup_tmp_workspace
 from .common import (
     C_TYPE_SPECS,
@@ -34,7 +35,7 @@ def c_generate_solution_code(method_def: CMethodDef) -> str:
     else:
         lines.append(f"    return {C_TYPE_SPECS[method_def.return_type].default};")
     lines.append("}")
-    return "\n".join(lines)
+    return prepend_node_definition_comments("\n".join(lines), "c", method_node_types(method_def))
 
 
 def _build_param_parse_lines(method_def: CMethodDef):

@@ -1,6 +1,7 @@
 """Python generator logic for classic function-style problems."""
 
 from code_gen.utils import TypeEnum, json_default_val
+from code_gen.core.node_comments import method_node_types, prepend_node_definition_comments
 from code_gen.core.workspace import create_tmp_workspace, cleanup_tmp_workspace
 
 from .common import (
@@ -25,7 +26,7 @@ def py_generate_solution_code(method_def: PyMethodDef) -> str:
         "        # write code here",
         return_line,
     ]
-    return "\n".join(lines)
+    return prepend_node_definition_comments("\n".join(lines), "py", method_node_types(method_def))
 
 
 def _py_generate_driver_code(method_def: PyMethodDef) -> str:

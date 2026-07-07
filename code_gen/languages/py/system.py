@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 from code_gen.utils import TypeEnum
+from code_gen.core.node_comments import class_node_types, prepend_node_definition_comments
 from code_gen.core.workspace import create_tmp_workspace, cleanup_tmp_workspace
 from code_gen.core.system_test_utils import (
     default_output_from_json_default,
@@ -59,7 +60,7 @@ def py_generate_system_code(class_def: PyClassDef) -> str:
         "",
         _generate_api_usage_comment(class_def),
     ]
-    return "\n".join(lines)
+    return prepend_node_definition_comments("\n".join(lines), "py", class_node_types(class_def))
 
 
 def _py_generate_system_dispatch_block(method_defs: List[PyMethodDef], class_name: str) -> str:
