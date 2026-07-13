@@ -132,6 +132,8 @@ result/system/main_trailer.<lang>
 
 判题时，编译脚本会把语言 header、用户代码和 trailer 拼成真正可执行文件。
 
+> Go runtime 中的 `StdinWrapper` 必须为 `bufio.Scanner` 显式设置更大的缓冲区。核心代码题会将数组、矩阵或系统设计参数序列化为单行 JSON，该行可能超过 Scanner 默认约 `64 KiB` 的 token 上限。不得移除 `runtimes/go/go_io_tools.go` 中的 `scanner.Buffer(...)` 配置，否则大测试点会在调用用户代码之前因 `bufio.Scanner: token too long` 而 Runtime Error。
+
 ### 文件名对应关系
 
 | 语言 | 用户模板 | 判题 trailer | OJ 提交文件名 |
