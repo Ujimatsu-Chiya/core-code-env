@@ -31,9 +31,9 @@ func CreateStdinWrapper() *StdinWrapper {
 			os.Exit(1)
 		}
 	}
-	return &StdinWrapper{
-		scanner: bufio.NewScanner(file),
-	}
+	scanner := bufio.NewScanner(file)
+	scanner.Buffer(make([]byte, 64*1024), 16*1024*1024)
+	return &StdinWrapper{scanner: scanner}
 }
 
 func (s *StdinWrapper) ReadLine() string {
