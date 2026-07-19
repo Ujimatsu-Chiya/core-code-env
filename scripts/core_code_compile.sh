@@ -143,6 +143,8 @@ compile_js() {
     printf 'const JsIoTools = require("%s/js/js_io_tools");\n' "$runtime_root"
     printf 'const JsParseTools = require("%s/js/js_parse_tools");\n' "$runtime_root"
     printf 'const JsTypeNode = require("%s/js/js_type_node");\n' "$runtime_root"
+    printf '%s\n' 'const TreeNode = JsTypeNode.TreeNode;'
+    printf '%s\n' 'const ListNode = JsTypeNode.ListNode;'
     printf '%s\n' 'const fs = require("fs");'
     printf '%s\n' '// The user'\''s code will be inserted below here.'
   } > .core_code_js_header.js

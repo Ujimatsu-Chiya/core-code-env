@@ -30,7 +30,6 @@ def des_tree(json_str):
 def _ser_tree_aux(root):
     if root is None:
         return []
-    print(type(root))
     q = deque([root])
     result = [root.val]
     while q:
